@@ -8,7 +8,18 @@ import (
 	"strings"
 )
 
-func helloHandler(w http.ResponseWriter, req *http.Request) {
+func main() {
+	port := "8080"
+	fmt.Printf("Server Listening on port %s\n", port)
+
+	http.HandleFunc("/", viewHandler)
+	err := http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
+}
+
+func printLogs(req *http.Request) {
 	req.ParseForm()
 
 	fmt.Println("form: ", req.Form)
@@ -19,35 +30,34 @@ func helloHandler(w http.ResponseWriter, req *http.Request) {
 		fmt.Println("key:", k)
 		fmt.Println("val:", strings.Join(v, ""))
 	}
-
-	fmt.Fprintf(w, "Hello server!")
 }
 
+//Page ... htmlに渡す値をまとめた構造体
 type Page struct {
 	Title string
 	Count int
 }
 
 func viewHandler(w http.ResponseWriter, req *http.Request) {
-	tmpl, err := template.ParseFiles("templates/layout.html")
+	printLogs(req)
+
+	tmpl, err := loadTemplate("layout")
 	if err != nil {
 		log.Fatal("ParseFiles: ", err)
-		panic(err)
 	}
 
-	page := Page{"Hello World.", 1}
+	page := Page{"Character rankinig!", 1}
 	err = tmpl.Execute(w, page)
 	if err != nil {
-		log.Fatal("Execute: ", err)
+		log.Fatal("Execute on viewHandler: ", err)
 	}
 }
 
-func main() {
-	fmt.Println("Server Start")
-
-	http.HandleFunc("/", viewHandler)
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
+func loadTemplate(name string) (*template.Template, error) {
+	tmpl, err := template.ParseFiles(
+		"templates/"+name+".html",
+		"templates/_header.html",
+		"templates/_footer.html",
+	)
+	return tmpl, err
 }
