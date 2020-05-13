@@ -34,19 +34,35 @@ func printLogs(req *http.Request) {
 
 //Page ... htmlに渡す値をまとめた構造体
 type Page struct {
-	Title string
-	Count int
+	Title     string
+	Character []string
+}
+
+var charas = []string{
+	"Cinnamon",
+	"Cappuccino",
+	"Mocha",
+	"Chiffon",
+	"Espresso",
+	"Milk",
+	"Azuki",
+	"Coco",
+	"Nuts",
+	"Poron",
+	"Corne",
+	"Berry",
+	"Cherry",
 }
 
 func viewHandler(w http.ResponseWriter, req *http.Request) {
 	printLogs(req)
 
-	tmpl, err := loadTemplate("layout")
+	tmpl, err := loadTemplate("index")
 	if err != nil {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	page := Page{"Character rankinig!", 1}
+	page := Page{"Character rankinig!", charas}
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)

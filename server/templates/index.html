@@ -1,0 +1,8 @@
+{{template "header" .}}
+{{ range $i, $v := .Character }}
+    <div>
+        <h3>Entry No.{{$i}}, Name: {{$v}}</h3>
+        <button type="button" name="{{$v}}" value="{{$i}}">{{$v}}に投票</button>
+    </div>
+{{ end }}
+{{template "footer"}}
