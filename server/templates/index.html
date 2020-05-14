@@ -11,22 +11,18 @@
             <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">About</a>
+            <a class="nav-link" href="/about">About</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">Characters</a>
+            <a class="nav-link" href="/characters">Characters</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">FAQ</a>
+            <a class="nav-link" href="/faq">FAQ</a>
         </li>
         </ul>
     </div>
 </nav>
 
-{{ range $i, $v := .Character }}
-    <div class="card-body">
-        <h5 class="card-title">Entry No.{{$i}}, Name: {{$v}}</h5>
-        <button type="button" name="{{$v}}" value="{{$i}}" class="btn btn-primary">{{$v}}に投票</button>
-    </div>
-{{ end }}
+<h1>{{.Title}}</h1>
+
 {{template "footer"}}

@@ -32,16 +32,8 @@ var charas = []string{
 	"Cherry",
 }
 
-// NameHandler /[name]のハンドラ
-func NameHandler(w http.ResponseWriter, req *http.Request) {
-	printLogs(req)
-
-	vars := mux.Vars(req)
-	fmt.Fprintf(w, "gorilla mux %s", vars["name"])
-}
-
-// ViewHandler /のハンドラ
-func ViewHandler(w http.ResponseWriter, req *http.Request) {
+// ViewTopHandler /のハンドラ
+func ViewTopHandler(w http.ResponseWriter, req *http.Request) {
 	printLogs(req)
 
 	tmpl, err := loadTemplate("index")
@@ -54,6 +46,62 @@ func ViewHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
 	}
+}
+
+// ViewAboutHandler Aboutページのハンドラ
+func ViewAboutHandler(w http.ResponseWriter, req *http.Request) {
+	printLogs(req)
+
+	tmpl, err := loadTemplate("about")
+	if err != nil {
+		log.Fatal("ParseFiles: ", err)
+	}
+
+	page := Page{"About", charas}
+	err = tmpl.Execute(w, page)
+	if err != nil {
+		log.Fatal("Execute on viewHandler: ", err)
+	}
+}
+
+// ViewFaqHandler FAQページのハンドラ
+func ViewFaqHandler(w http.ResponseWriter, req *http.Request) {
+	printLogs(req)
+
+	tmpl, err := loadTemplate("faq")
+	if err != nil {
+		log.Fatal("ParseFiles: ", err)
+	}
+
+	page := Page{"FAQ", charas}
+	err = tmpl.Execute(w, page)
+	if err != nil {
+		log.Fatal("Execute on viewHandler: ", err)
+	}
+}
+
+// ViewCharacterHandler キャラクターページのハンドラ
+func ViewCharacterHandler(w http.ResponseWriter, req *http.Request) {
+	printLogs(req)
+
+	tmpl, err := loadTemplate("characters/index")
+	if err != nil {
+		log.Fatal("ParseFiles: ", err)
+	}
+
+	page := Page{"Characters!", charas}
+	err = tmpl.Execute(w, page)
+	if err != nil {
+		log.Fatal("Execute on viewHandler: ", err)
+	}
+}
+
+// NameHandler /[name]のハンドラ
+func NameHandler(w http.ResponseWriter, req *http.Request) {
+	printLogs(req)
+
+	vars := mux.Vars(req)
+	fmt.Fprintf(w, "gorilla mux %s", vars["name"])
 }
 
 func loadTemplate(name string) (*template.Template, error) {

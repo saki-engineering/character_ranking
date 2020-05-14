@@ -14,8 +14,12 @@ func main() {
 	fmt.Printf("Server Listening on port %s\n", port)
 
 	r := mux.NewRouter()
-	r.HandleFunc("/", handlers.ViewHandler)
-	r.HandleFunc("/{name}", handlers.NameHandler)
+	r.HandleFunc("/", handlers.ViewTopHandler)
+	r.HandleFunc("/about", handlers.ViewAboutHandler)
+	r.HandleFunc("/faq", handlers.ViewFaqHandler)
+
+	r.HandleFunc("/characters", handlers.ViewCharacterHandler)
+	r.HandleFunc("/characters/{name}", handlers.NameHandler)
 
 	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", http.FileServer(http.Dir("./resources"))))
 

@@ -1,0 +1,11 @@
+{{template "header" .}}
+
+<button type="button" onclick="location.href='/'" class="btn btn-primary">topに戻る</button>
+
+{{ range $i, $v := .Character }}
+    <div class="card-body">
+        <h5 class="card-title">Entry No.{{$i}}, Name: {{$v}}</h5>
+        <button type="button" name="{{$v}}" value="{{$i}}" class="btn btn-primary">{{$v}}に投票</button>
+    </div>
+{{ end }}
+{{template "footer"}}
