@@ -18,6 +18,8 @@ func main() {
 	r.HandleFunc("/", viewHandler)
 	r.HandleFunc("/{name}", nameHandler)
 
+	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", http.FileServer(http.Dir("./resources"))))
+
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
