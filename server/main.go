@@ -6,13 +6,20 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
 	port := "8080"
 	fmt.Printf("Server Listening on port %s\n", port)
 
-	http.HandleFunc("/", viewHandler)
+	r := mux.NewRouter()
+	r.HandleFunc("/", viewHandler)
+	r.HandleFunc("/{name}", nameHandler)
+	http.Handle("/", r)
+
+	//http.HandleFunc("/", viewHandler)
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
@@ -52,6 +59,13 @@ var charas = []string{
 	"Corne",
 	"Berry",
 	"Cherry",
+}
+
+func nameHandler(w http.ResponseWriter, req *http.Request) {
+	printLogs(req)
+
+	vars := mux.Vars(req)
+	fmt.Fprintf(w, "gorilla mux %s", vars["name"])
 }
 
 func viewHandler(w http.ResponseWriter, req *http.Request) {
