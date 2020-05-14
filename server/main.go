@@ -17,10 +17,8 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", viewHandler)
 	r.HandleFunc("/{name}", nameHandler)
-	http.Handle("/", r)
 
-	//http.HandleFunc("/", viewHandler)
-	err := http.ListenAndServe(":"+port, nil)
+	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
