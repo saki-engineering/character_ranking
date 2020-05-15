@@ -18,10 +18,12 @@ func main() {
 	r.HandleFunc("/about", handlers.ViewAboutHandler)
 	r.HandleFunc("/faq", handlers.ViewFaqHandler)
 
-	r.HandleFunc("/characters", handlers.ViewCharacterHandler)
-	r.HandleFunc("/characters/{name}", handlers.NameHandler)
+	s := r.PathPrefix("/characters").Subrouter()
+	s.HandleFunc("", handlers.ViewCharacterHandler)
+	s.HandleFunc("/{name}", handlers.NameHandler)
 
-	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", http.FileServer(http.Dir("./resources"))))
+	fs := http.FileServer(http.Dir("./resources"))
+	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
 
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
