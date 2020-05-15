@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"./handlers"
+	"./middlewares"
 	"github.com/gorilla/mux"
 )
 
@@ -24,6 +25,8 @@ func main() {
 
 	fs := http.FileServer(http.Dir("./resources"))
 	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
+
+	r.Use(middlewares.Logging)
 
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {

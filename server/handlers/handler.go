@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 	"text/template"
 
 	"github.com/gorilla/mux"
@@ -34,8 +33,6 @@ var charas = []string{
 
 // ViewTopHandler /のハンドラ
 func ViewTopHandler(w http.ResponseWriter, req *http.Request) {
-	printLogs(req)
-
 	tmpl, err := loadTemplate("index")
 	if err != nil {
 		log.Fatal("ParseFiles: ", err)
@@ -50,8 +47,6 @@ func ViewTopHandler(w http.ResponseWriter, req *http.Request) {
 
 // ViewAboutHandler Aboutページのハンドラ
 func ViewAboutHandler(w http.ResponseWriter, req *http.Request) {
-	printLogs(req)
-
 	tmpl, err := loadTemplate("about")
 	if err != nil {
 		log.Fatal("ParseFiles: ", err)
@@ -66,8 +61,6 @@ func ViewAboutHandler(w http.ResponseWriter, req *http.Request) {
 
 // ViewFaqHandler FAQページのハンドラ
 func ViewFaqHandler(w http.ResponseWriter, req *http.Request) {
-	printLogs(req)
-
 	tmpl, err := loadTemplate("faq")
 	if err != nil {
 		log.Fatal("ParseFiles: ", err)
@@ -82,8 +75,6 @@ func ViewFaqHandler(w http.ResponseWriter, req *http.Request) {
 
 // ViewCharacterHandler キャラクターページのハンドラ
 func ViewCharacterHandler(w http.ResponseWriter, req *http.Request) {
-	printLogs(req)
-
 	tmpl, err := loadTemplate("characters/index")
 	if err != nil {
 		log.Fatal("ParseFiles: ", err)
@@ -98,8 +89,6 @@ func ViewCharacterHandler(w http.ResponseWriter, req *http.Request) {
 
 // NameHandler /[name]のハンドラ
 func NameHandler(w http.ResponseWriter, req *http.Request) {
-	printLogs(req)
-
 	vars := mux.Vars(req)
 	fmt.Fprintf(w, "gorilla mux %s", vars["name"])
 }
@@ -111,17 +100,4 @@ func loadTemplate(name string) (*template.Template, error) {
 		"templates/_footer.html",
 	)
 	return tmpl, err
-}
-
-func printLogs(req *http.Request) {
-	req.ParseForm()
-
-	fmt.Println("form: ", req.Form)
-	fmt.Println("path: ", req.URL.Path)
-	fmt.Println("scheme: ", req.URL.Scheme)
-	fmt.Println(req.Form["url_long"])
-	for k, v := range req.Form {
-		fmt.Println("key:", k)
-		fmt.Println("val:", strings.Join(v, ""))
-	}
 }
