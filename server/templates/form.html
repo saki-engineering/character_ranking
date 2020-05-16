@@ -3,7 +3,7 @@
 <form action="/characters/name/voted" method="post">
   <div class="form-group">
     <label for="form-age">年齢</label>
-    <select class="form-control" id="form-age">
+    <select class="form-control" name="age" id="form-age">
       <option>1</option>
       <option>2</option>
       <option>3</option>
@@ -13,7 +13,7 @@
   </div>
   <div class="form-group">
     <label for="form-gender">性別</label>
-    <select class="form-control" id="form-gender">
+    <select class="form-control" name="gender" id="form-gender">
       <option selected>(選択してください)</option>
       <option>女性</option>
       <option>男性</option>
@@ -22,7 +22,7 @@
   </div>
   <div class="form-group">
     <label for="form-address">お住いの都道府県</label>
-    <select class="form-control" id="form-address">
+    <select class="form-control" name="address" id="form-address">
       <option>1</option>
       <option>2</option>
       <option>3</option>
@@ -30,7 +30,7 @@
     </select>
   </div>
   <div class="form-group form-check">
-    <input type="checkbox" class="form-check-input" id="form-check>
+    <input type="checkbox" class="form-check-input" name="check" id="form-check>
     <label class="form-check-label" for="form-check">利用規約に同意しました</label>
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>
