@@ -19,7 +19,9 @@ $(function () {
 
     // characterページの投票ボタン
     $(".btn-vote").on('click', function() {
-        console.log("投票ボタンだよ");
+        var ranking = JSON.parse(localStorage.getItem("ranking"));
+        console.log($(this).val());
+        //$.post("")
     });
 
     // フォームのsubmit時にローカルストレージに保存
