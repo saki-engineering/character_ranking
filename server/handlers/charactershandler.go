@@ -43,6 +43,8 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 	if req.Form["isAnswered"][0] == "false" {
 		http.Redirect(w, req, "/form", 302)
 	} else {
+		//ここに投票処理がが入る
+
 		url := "/characters/" + req.Form["character"][0] + "/voted"
 		http.Redirect(w, req, url, 302)
 	}
