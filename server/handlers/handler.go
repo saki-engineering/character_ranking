@@ -115,18 +115,18 @@ func ViewFormHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// FormVoteHandler アンケートフォームから投票した時のハンドラ
+func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
+	http.Redirect(w, req, "/characters/name/voted", 302)
+}
+
 // VoteHandler 投票ボタンが押された時に、フォームに行くかVoted画面に行くかを判定する
 func VoteHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
-	//まずはformに飛ばすかどうかの前段階リクエストかどうか
-	if len(req.Form["isAnswered"]) > 0 {
-		if req.Form["isAnswered"][0] == "false" {
-			http.Redirect(w, req, "/form", 302)
-		} else {
-			http.Redirect(w, req, "/characters/name/voted", 302)
-		}
-	} else { //formに回答した後のpostならば
+	if req.Form["isAnswered"][0] == "false" {
+		http.Redirect(w, req, "/form", 302)
+	} else {
 		http.Redirect(w, req, "/characters/name/voted", 302)
 	}
 }

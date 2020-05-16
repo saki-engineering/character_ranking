@@ -22,7 +22,7 @@ $(function () {
         console.log($(this).val());
         var ranking = JSON.parse(localStorage.getItem("ranking"));
         
-        var url = "/characters/"+$(this).val()+"/voted"
+        var url = "/characters/"+$(this).val()+"/vote"
         var isAnswered = ranking.idAnswered;
         var form = `<form method='post' action='${url}' id='refresh' style='display: none;'>
                         <input type='hidden' name='isAnswered' value='${isAnswered}'>
