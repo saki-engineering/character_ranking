@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"text/template"
@@ -119,11 +118,20 @@ func ViewFormHandler(w http.ResponseWriter, req *http.Request) {
 // VoteHandler 投票ボタンが押された時に、フォームに行くかVoted画面に行くかを判定する
 func VoteHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
-	fmt.Println(req.Form["isAnswered"])
-	http.Redirect(w, req, "/form", 302)
+
+	//まずはformに飛ばすかどうかの前段階リクエストかどうか
+	if len(req.Form["isAnswered"]) > 0 {
+		if req.Form["isAnswered"][0] == "false" {
+			http.Redirect(w, req, "/form", 302)
+		} else {
+			http.Redirect(w, req, "/characters/name/voted", 302)
+		}
+	} else { //formに回答した後のpostならば
+		http.Redirect(w, req, "/characters/name/voted", 302)
+	}
 }
 
-// VotedHandler フォームを表示
+// VotedHandler 投票終了後の画面を表示
 func VotedHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("characters/voted")
 	if err != nil {
