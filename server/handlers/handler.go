@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"text/template"
@@ -113,6 +114,13 @@ func ViewFormHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
 	}
+}
+
+// VoteHandler 投票ボタンが押された時に、フォームに行くかVoted画面に行くかを判定する
+func VoteHandler(w http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+	fmt.Println(req.Form["isAnswered"])
+	http.Redirect(w, req, "/form", 302)
 }
 
 // VotedHandler フォームを表示

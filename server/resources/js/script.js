@@ -19,9 +19,16 @@ $(function () {
 
     // characterページの投票ボタン
     $(".btn-vote").on('click', function() {
-        var ranking = JSON.parse(localStorage.getItem("ranking"));
         console.log($(this).val());
-        //$.post("")
+        var ranking = JSON.parse(localStorage.getItem("ranking"));
+        
+        var url = "/characters/"+$(this).val()+"/voted"
+        var isAnswered = ranking.idAnswered;
+        var form = `<form method='post' action='${url}' id='refresh' style='display: none;'>
+                        <input type='hidden' name='isAnswered' value='${isAnswered}'>
+                    </form>`;
+        $("body").append(form);
+        $("#refresh").submit();
     });
 
     // フォームのsubmit時にローカルストレージに保存

@@ -23,7 +23,8 @@ func main() {
 	s := r.PathPrefix("/characters").Subrouter()
 	s.HandleFunc("", handlers.ViewCharacterHandler)
 	s.HandleFunc("/{name}", handlers.CharacterDetailHandler)
-	s.HandleFunc("/{name}/voted", handlers.VotedHandler)
+	s.HandleFunc("/{name}/voted", handlers.VotedHandler).Methods("GET")
+	s.HandleFunc("/{name}/voted", handlers.VoteHandler).Methods("POST")
 
 	fs := http.FileServer(http.Dir("./resources"))
 	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
