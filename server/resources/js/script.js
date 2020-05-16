@@ -23,6 +23,9 @@ $(function () {
         var ranking = JSON.parse(localStorage.getItem("ranking"));
         
         var character = $(this).val();
+        ranking.fromCharaId = [character];
+        localStorage.setItem("ranking", JSON.stringify(ranking));
+
         var url = "/characters/"+character+"/vote"
         var isAnswered = ranking.idAnswered;
         var form = `<form method='post' action='${url}' id='refresh' style='display: none;'>
