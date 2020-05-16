@@ -18,14 +18,16 @@ func main() {
 	r.HandleFunc("/", handlers.ViewTopHandler)
 	r.HandleFunc("/about", handlers.ViewAboutHandler)
 	r.HandleFunc("/faq", handlers.ViewFaqHandler)
-	r.HandleFunc("/form", handlers.ViewFormHandler)
-	r.HandleFunc("/form/vote", handlers.FormVoteHandler)
 
-	s := r.PathPrefix("/characters").Subrouter()
-	s.HandleFunc("", handlers.ViewCharacterHandler)
-	s.HandleFunc("/{name}", handlers.CharacterDetailHandler)
-	s.HandleFunc("/{name}/vote", handlers.VoteHandler).Methods("POST")
-	s.HandleFunc("/{name}/voted", handlers.VotedHandler)
+	s1 := r.PathPrefix("/characters").Subrouter()
+	s1.HandleFunc("", handlers.CharacterHandler)
+	s1.HandleFunc("/{name}", handlers.CharacterDetailHandler)
+	s1.HandleFunc("/{name}/vote", handlers.CharacterVoteHandler).Methods("POST")
+	s1.HandleFunc("/{name}/voted", handlers.CharacterVotedHandler)
+
+	s2 := r.PathPrefix("/form").Subrouter()
+	s2.HandleFunc("", handlers.FormHandler)
+	s2.HandleFunc("/vote", handlers.FormVoteHandler).Methods("POST")
 
 	fs := http.FileServer(http.Dir("./resources"))
 	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
