@@ -21,5 +21,9 @@ func FormHandler(w http.ResponseWriter, req *http.Request) {
 
 // FormVoteHandler アンケートフォームから投票した時のハンドラ
 func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
-	http.Redirect(w, req, "/characters/name/voted", 302)
+	//ここにuser登録処理と、投票処理が入る
+
+	req.ParseForm()
+	url := "/characters/" + req.Form["character"][0] + "/voted"
+	http.Redirect(w, req, url, 302)
 }

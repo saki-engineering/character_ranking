@@ -39,6 +39,10 @@ $(function () {
     // フォームのsubmit時にローカルストレージに保存
     $("#questionnaire").submit(function() {
         var ranking = JSON.parse(localStorage.getItem("ranking"));
+
+        var form = `<input type='hidden' name='character' value='${ranking.fromCharaId[0]}'>`;
+        $(this).append(form);
+        
         ranking.idAnswered = true;
         ranking.age = Number($("#form-age").val());
         ranking.gender = Number($("#form-gender").val());
