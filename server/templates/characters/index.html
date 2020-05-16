@@ -6,7 +6,7 @@
     <div class="card-body">
         <h5 class="card-title">Entry No.{{$i}}, Name: {{$v}}</h5>
         <button type="button" onclick="location.href='/characters/{{$v}}'" class="btn btn-info">みんなへのひとこと</button>
-        <button type="button" onclick="location.href='/form'" class="btn btn-primary">{{$v}}に投票</button>
+        <button type="button" onclick="location.href='/form'" class="btn btn-primary btn-vote">{{$v}}に投票</button>
     </div>
 {{ end }}
 {{template "footer"}}

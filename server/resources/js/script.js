@@ -14,4 +14,8 @@ $(function () {
     };
     
     console.log(JSON.parse(localStorage.getItem("ranking")));
+
+    $(".btn-vote").on('click', function() {
+        console.log("投票ボタンだよ");
+    });
 });
