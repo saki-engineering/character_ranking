@@ -115,6 +115,20 @@ func ViewFormHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// VotedHandler フォームを表示
+func VotedHandler(w http.ResponseWriter, req *http.Request) {
+	tmpl, err := loadTemplate("characters/voted")
+	if err != nil {
+		log.Fatal("ParseFiles: ", err)
+	}
+
+	page := Page{"form", charas}
+	err = tmpl.Execute(w, page)
+	if err != nil {
+		log.Fatal("Execute on viewHandler: ", err)
+	}
+}
+
 func loadTemplate(name string) (*template.Template, error) {
 	tmpl, err := template.ParseFiles(
 		"templates/"+name+".html",
