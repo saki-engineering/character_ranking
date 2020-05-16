@@ -15,19 +15,19 @@ type Page struct {
 }
 
 var charas = []string{
-	"Cinnamon",
-	"Cappuccino",
-	"Mocha",
-	"Chiffon",
-	"Espresso",
-	"Milk",
-	"Azuki",
-	"Coco",
-	"Nuts",
-	"Poron",
-	"Corne",
-	"Berry",
-	"Cherry",
+	"cinnamon",
+	"cappuccino",
+	"mocha",
+	"chiffon",
+	"espresso",
+	"milk",
+	"azuki",
+	"coco",
+	"nuts",
+	"poron",
+	"corne",
+	"berry",
+	"cherry",
 }
 
 // ViewTopHandler /のハンドラ
