@@ -132,8 +132,8 @@ func VotedHandler(w http.ResponseWriter, req *http.Request) {
 func loadTemplate(name string) (*template.Template, error) {
 	tmpl, err := template.ParseFiles(
 		"templates/"+name+".html",
-		"templates/_header.html",
-		"templates/_footer.html",
+		"templates/partials/_header.html",
+		"templates/partials/_footer.html",
 	)
 	return tmpl, err
 }
