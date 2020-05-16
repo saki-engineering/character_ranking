@@ -99,8 +99,20 @@ func CharacterDetailHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
 	}
+}
 
-	//fmt.Fprintf(w, "gorilla mux %s", vars["name"])
+// ViewFormHandler フォームを表示
+func ViewFormHandler(w http.ResponseWriter, req *http.Request) {
+	tmpl, err := loadTemplate("form")
+	if err != nil {
+		log.Fatal("ParseFiles: ", err)
+	}
+
+	page := Page{"form", charas}
+	err = tmpl.Execute(w, page)
+	if err != nil {
+		log.Fatal("Execute on viewHandler: ", err)
+	}
 }
 
 func loadTemplate(name string) (*template.Template, error) {

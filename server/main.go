@@ -18,6 +18,7 @@ func main() {
 	r.HandleFunc("/", handlers.ViewTopHandler)
 	r.HandleFunc("/about", handlers.ViewAboutHandler)
 	r.HandleFunc("/faq", handlers.ViewFaqHandler)
+	r.HandleFunc("/form", handlers.ViewFormHandler)
 
 	s := r.PathPrefix("/characters").Subrouter()
 	s.HandleFunc("", handlers.ViewCharacterHandler)
