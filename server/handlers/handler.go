@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"text/template"
@@ -87,10 +86,21 @@ func ViewCharacterHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// NameHandler /[name]のハンドラ
-func NameHandler(w http.ResponseWriter, req *http.Request) {
+// CharacterDetailHandler /[name]のハンドラ
+func CharacterDetailHandler(w http.ResponseWriter, req *http.Request) {
+	tmpl, err := loadTemplate("characters/detail")
+	if err != nil {
+		log.Fatal("ParseFiles: ", err)
+	}
+
 	vars := mux.Vars(req)
-	fmt.Fprintf(w, "gorilla mux %s", vars["name"])
+	page := Page{vars["name"], charas}
+	err = tmpl.Execute(w, page)
+	if err != nil {
+		log.Fatal("Execute on viewHandler: ", err)
+	}
+
+	//fmt.Fprintf(w, "gorilla mux %s", vars["name"])
 }
 
 func loadTemplate(name string) (*template.Template, error) {

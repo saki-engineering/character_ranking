@@ -21,7 +21,7 @@ func main() {
 
 	s := r.PathPrefix("/characters").Subrouter()
 	s.HandleFunc("", handlers.ViewCharacterHandler)
-	s.HandleFunc("/{name}", handlers.NameHandler)
+	s.HandleFunc("/{name}", handlers.CharacterDetailHandler)
 
 	fs := http.FileServer(http.Dir("./resources"))
 	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
