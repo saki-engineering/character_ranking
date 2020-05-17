@@ -17,6 +17,14 @@ $(function () {
         localStorage.setItem("ranking", JSON.stringify(ranking));
     };
 
+    //characterの投票ボタンを履歴に沿って無効化
+    $(".btn-vote").each(function(i, obj) {
+        var votingtodayHistory = JSON.parse(localStorage.getItem("ranking")).votingTodayHistory;
+        if(votingtodayHistory.indexOf($(obj).val()) >= 0){
+            $(obj).prop("disabled", true);
+        }
+    });
+
     // characterページの投票ボタン
     $(".btn-vote").on('click', function() {
         var ranking = JSON.parse(localStorage.getItem("ranking"));
