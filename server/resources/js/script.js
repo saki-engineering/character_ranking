@@ -19,15 +19,19 @@ $(function () {
 
     // characterページの投票ボタン
     $(".btn-vote").on('click', function() {
-        console.log($(this).val());
         var ranking = JSON.parse(localStorage.getItem("ranking"));
         
         var character = $(this).val();
         ranking.fromCharaId = [character];
-        localStorage.setItem("ranking", JSON.stringify(ranking));
-
         var url = "/characters/"+character+"/vote"
         var isAnswered = ranking.idAnswered;
+        if (isAnswered) {
+            ranking.votingTodayHistory.push(character);
+            ranking.votingHistory.push(character);
+        }
+
+        localStorage.setItem("ranking", JSON.stringify(ranking));
+
         var form = `<form method='post' action='${url}' id='refresh' style='display: none;'>
                         <input type='hidden' name='character' value='${character}'>
                         <input type='hidden' name='isAnswered' value='${isAnswered}'>
@@ -39,14 +43,17 @@ $(function () {
     // フォームのsubmit時にローカルストレージに保存
     $("#questionnaire").submit(function() {
         var ranking = JSON.parse(localStorage.getItem("ranking"));
+        var character = ranking.fromCharaId[0];
 
-        var form = `<input type='hidden' name='character' value='${ranking.fromCharaId[0]}'>`;
+        var form = `<input type='hidden' name='character' value='${character}'>`;
         $(this).append(form);
         
         ranking.idAnswered = true;
         ranking.age = Number($("#form-age").val());
         ranking.gender = Number($("#form-gender").val());
         ranking.area = Number($("#form-address").val());
+        ranking.votingTodayHistory.push(character);
+        ranking.votingHistory.push(character);
         localStorage.setItem("ranking", JSON.stringify(ranking));
     });
 });
