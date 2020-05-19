@@ -2,12 +2,29 @@ version: '3.3'
 services:
     web_server:
         build: ./server
+        container_name: chara_web_server
         ports: 
             - "8080:8080"
         hostname: web-server
 
     vote_api:
         build: ./api
+        container_name: chara_vote_api
         ports:
             - "9090:9090"
         hostname: vote-api
+
+    mysql:
+        image: mysql:5.7
+        container_name: chara_mysql
+        environment:
+            MYSQL_ROOT_USER: root
+            MYSQL_ROOT_PASSWORD: pass
+            MYSQL_DATABASE: sampledb
+        ports: 
+            - "3306:3306"
+        volumes:
+            - db-volume:/var/lib/mysql
+
+volumes:
+    db-volume:
