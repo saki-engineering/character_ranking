@@ -11,7 +11,7 @@ import (
 
 func main() {
 	port := "8080"
-	fmt.Printf("Server Listening on port %s\n", port)
+	fmt.Printf("Web Server Listening on port %s\n", port)
 
 	r := routers.CreateRouter()
 
