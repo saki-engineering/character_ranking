@@ -13,10 +13,13 @@ services:
         ports:
             - "9090:9090"
         hostname: vote-api
+        depends_on:
+            - mysql
 
     mysql:
         image: mysql:5.7
         container_name: chara_mysql
+        # 中に入るのは $mysql --user=root --password=pass
         environment:
             MYSQL_ROOT_USER: root
             MYSQL_ROOT_PASSWORD: pass
