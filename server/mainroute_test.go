@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"./routers"
+	"app/routers"
 )
 
 // /にgetしたとき

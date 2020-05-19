@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"./middlewares"
-	"./routers"
+	"app/middlewares"
+	"app/routers"
 )
 
 func main() {

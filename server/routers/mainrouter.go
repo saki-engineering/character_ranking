@@ -1,7 +1,8 @@
 package routers
 
 import (
-	"../handlers"
+	"app/handlers"
+
 	"github.com/gorilla/mux"
 )
 
