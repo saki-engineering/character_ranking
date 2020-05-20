@@ -6,9 +6,12 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type vote struct {
-	Chara, User, IP string
-	Time            string
+// Vote 投票結果の構造体
+type Vote struct {
+	Chara string         `json:"character"`
+	User  sql.NullString `json:"user"`
+	Time  sql.NullString `json:"time"`
+	IP    sql.NullString `json:"ip"`
 }
 
 // ConnectDB DBと接続してポインタを返す
@@ -47,20 +50,24 @@ func InsertVotes(db *sql.DB, chara string) error {
 	return nil
 }
 
-// GetAllData votesテーブルの全てのデータを取得
-/*
-func GetAllData(db *sql.DB) {
+// GetAllVoteData votesテーブルの全てのデータを取得
+func GetAllVoteData(db *sql.DB) ([]Vote, error) {
 	const sqlStr = `SELECT * FROM votes;`
 
 	rows, err := db.Query(sqlStr)
+	if err != nil {
+		return nil, err
+	}
 	defer rows.Close()
 
-	if err != nil {
-		log.Fatal("GetAllData: ", err)
-	}
-
+	dataArray := make([]Vote, 0)
 	for rows.Next() {
-
+		var data Vote
+		err := rows.Scan(&data.Chara, &data.User, &data.Time, &data.IP)
+		if err != nil {
+			return nil, err
+		}
+		dataArray = append(dataArray, data)
 	}
+	return dataArray, nil
 }
-*/

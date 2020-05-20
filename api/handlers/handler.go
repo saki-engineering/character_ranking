@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -17,7 +18,22 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 
 // VoteResultHandler /vote/のGETハンドラ
 func VoteResultHandler(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "Vote root")
+	db, e := models.ConnectDB()
+	if e != nil {
+		log.Fatal("connect DB: ", e)
+	}
+	defer db.Close()
+
+	data, err := models.GetAllVoteData(db)
+	if err != nil {
+		log.Println("fail GetAllVoteData: ", err)
+	}
+
+	bytes, err2 := json.Marshal(data)
+	if err2 != nil {
+		log.Println("fail json Marshal: ", err2)
+	}
+	w.Write([]byte(string(bytes)))
 }
 
 // VoteCharaHandler /vote/のPOSTハンドラ
