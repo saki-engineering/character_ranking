@@ -13,8 +13,17 @@ func main() {
 	port := "9090"
 	fmt.Printf("API Server Listening on port %s\n", port)
 
-	db := models.ConnectDB()
-	models.CreateTable(db)
+	db, e := models.ConnectDB()
+	if e != nil {
+		log.Fatal("connect DB: ", e)
+	}
+
+	if err := models.CreateTable(db); err != nil {
+		log.Println("create table: ", err)
+	} else {
+		log.Println("success to create votes")
+	}
+
 	db.Close()
 
 	r := routers.CreateRouter()

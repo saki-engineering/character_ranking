@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"log"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -13,7 +12,7 @@ type vote struct {
 }
 
 // ConnectDB DBと接続してポインタを返す
-func ConnectDB() *sql.DB {
+func ConnectDB() (*sql.DB, error) {
 	dbDriver := "mysql"
 	dbUser := "root"
 	dbPass := "pass"
@@ -21,16 +20,11 @@ func ConnectDB() *sql.DB {
 
 	//db, e := sql.Open("mysql", "root:pass@tcp(mysql:3306)/sampledb")
 	db, e := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp(mysql:3306)/"+dbName)
-	if e != nil {
-		log.Fatal("DB: ", e)
-	} else {
-		log.Println("Connected to mysql.")
-	}
-	return db
+	return db, e
 }
 
 // CreateTable 投票結果を入れるテーブルがなければ作る
-func CreateTable(db *sql.DB) {
+func CreateTable(db *sql.DB) error {
 	const createTable = `CREATE TABLE IF NOT EXISTS votes(
 		chara     VARCHAR(20) NOT NULL,
 		user      VARCHAR(100),
@@ -39,11 +33,7 @@ func CreateTable(db *sql.DB) {
 	);`
 
 	_, err := db.Exec(createTable)
-	if err != nil {
-		log.Fatal("createTable: ", err)
-	} else {
-		log.Println("createTable: success to create votes")
-	}
+	return err
 }
 
 // InsertVotes 指定キャラの投票データをDBに追加

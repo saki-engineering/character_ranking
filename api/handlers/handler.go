@@ -34,7 +34,10 @@ func VoteCharaHandler(w http.ResponseWriter, req *http.Request) {
 
 	req.ParseForm()
 
-	db := models.ConnectDB()
+	db, e := models.ConnectDB()
+	if e != nil {
+		log.Fatal("connect DB: ", e)
+	}
 	defer db.Close()
 
 	err := models.InsertVotes(db, req.Form.Get("character"))
@@ -43,7 +46,4 @@ func VoteCharaHandler(w http.ResponseWriter, req *http.Request) {
 	} else {
 		log.Println("insert success")
 	}
-
-	fmt.Println("form: ", req.Form)
-	fmt.Println("form: ", req.Form.Get("character"))
 }
