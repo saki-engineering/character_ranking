@@ -14,9 +14,8 @@ func main() {
 	fmt.Printf("API Server Listening on port %s\n", port)
 
 	db := models.ConnectDB()
-	defer db.Close()
-
 	models.CreateTable(db)
+	db.Close()
 
 	r := routers.CreateRouter()
 
