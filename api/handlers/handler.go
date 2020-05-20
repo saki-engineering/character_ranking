@@ -15,23 +15,14 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "Hello World")
 }
 
-// VoteRootHandler /vote/のハンドラ
-func VoteRootHandler(w http.ResponseWriter, req *http.Request) {
+// VoteResultHandler /vote/のGETハンドラ
+func VoteResultHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "Vote root")
 }
 
-// CharaResultHandler /vote/{name}のGETハンドラ
-func CharaResultHandler(w http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	fmt.Fprintf(w, vars["name"])
-}
-
-// VoteCharaHandler /vote/{name}のPOSTハンドラ
-// テストするためには $curl -X POST -d "character=cinamon" localhost:9090/vote/name
+// VoteCharaHandler /vote/のPOSTハンドラ
+// テストするためには $curl -X POST -d "character=cinamon" localhost:9090/vote/
 func VoteCharaHandler(w http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	fmt.Fprintf(w, vars["name"])
-
 	req.ParseForm()
 
 	db, e := models.ConnectDB()
@@ -46,4 +37,10 @@ func VoteCharaHandler(w http.ResponseWriter, req *http.Request) {
 	} else {
 		log.Println("insert success")
 	}
+}
+
+// CharaResultHandler /vote/{name}のGETハンドラ
+func CharaResultHandler(w http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	fmt.Fprintf(w, vars["name"])
 }

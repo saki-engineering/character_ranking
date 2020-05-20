@@ -12,9 +12,9 @@ func CreateRouter() *mux.Router {
 	r.HandleFunc("/", handlers.RootHandler)
 
 	s1 := r.PathPrefix("/vote").Subrouter()
-	s1.HandleFunc("/", handlers.VoteRootHandler)
+	s1.HandleFunc("/", handlers.VoteResultHandler).Methods("GET")
+	s1.HandleFunc("/", handlers.VoteCharaHandler).Methods("POST")
 	s1.HandleFunc("/{name}", handlers.CharaResultHandler).Methods("GET")
-	s1.HandleFunc("/{name}", handlers.VoteCharaHandler).Methods("POST")
 
 	return r
 }
