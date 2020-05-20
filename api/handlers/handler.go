@@ -58,5 +58,21 @@ func VoteCharaHandler(w http.ResponseWriter, req *http.Request) {
 // CharaResultHandler /vote/{name}のGETハンドラ
 func CharaResultHandler(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
-	fmt.Fprintf(w, vars["name"])
+
+	db, e := models.ConnectDB()
+	if e != nil {
+		log.Fatal("connect DB: ", e)
+	}
+	defer db.Close()
+
+	data, err := models.GetCharaVoteData(db, vars["name"])
+	if err != nil {
+		log.Println("fail GetCharaVoteData: ", err)
+	}
+
+	bytes, err2 := json.Marshal(data)
+	if err2 != nil {
+		log.Println("fail json Marshal: ", err2)
+	}
+	w.Write([]byte(string(bytes)))
 }

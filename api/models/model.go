@@ -71,3 +71,25 @@ func GetAllVoteData(db *sql.DB) ([]Vote, error) {
 	}
 	return dataArray, nil
 }
+
+// GetCharaVoteData votesテーブルの全てのデータを取得
+func GetCharaVoteData(db *sql.DB, chara string) ([]Vote, error) {
+	const sqlStr = `SELECT * FROM votes WHERE chara=?;`
+
+	rows, err := db.Query(sqlStr, chara)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	dataArray := make([]Vote, 0)
+	for rows.Next() {
+		var data Vote
+		err := rows.Scan(&data.Chara, &data.User, &data.Time, &data.IP)
+		if err != nil {
+			return nil, err
+		}
+		dataArray = append(dataArray, data)
+	}
+	return dataArray, nil
+}
