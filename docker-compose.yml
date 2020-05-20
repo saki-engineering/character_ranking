@@ -19,6 +19,8 @@ services:
     mysql:
         image: mysql:5.7
         container_name: chara_mysql
+        command: 
+            - --sql-mode=ONLY_FULL_GROUP_BY,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
         # 中に入るのは $mysql --user=root --password=pass
         environment:
             MYSQL_ROOT_USER: root

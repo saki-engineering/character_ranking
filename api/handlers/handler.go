@@ -2,7 +2,10 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+
+	"app/models"
 
 	"github.com/gorilla/mux"
 )
@@ -30,5 +33,17 @@ func VoteCharaHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, vars["name"])
 
 	req.ParseForm()
+
+	db := models.ConnectDB()
+	defer db.Close()
+
+	err := models.InsertVotes(db, req.Form.Get("character"))
+	if err != nil {
+		log.Println("insert: ", err)
+	} else {
+		log.Println("insert success")
+	}
+
 	fmt.Println("form: ", req.Form)
+	fmt.Println("form: ", req.Form.Get("character"))
 }
