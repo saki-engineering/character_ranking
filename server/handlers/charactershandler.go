@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/gorilla/mux"
 )
@@ -44,6 +45,30 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 		http.Redirect(w, req, "/form", 302)
 	} else {
 		//ここに投票処理がが入る
+		//client := new(http.Client)
+
+		u := &url.URL{}
+		u.Scheme = "http"
+		u.Host = "vote_api:9090"
+		u.Path = "/vote/"
+		uStr := u.String()
+
+		values := url.Values{}
+		values.Add("character", req.Form.Get("character"))
+
+		_, err := http.PostForm(uStr, values)
+		if err != nil {
+			log.Println("client post err: ", err)
+		}
+
+		/*
+			res, err := client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
+			if err != nil {
+				log.Println("client post err: ", err)
+				return
+			}
+			defer res.Body.Close()
+		*/
 
 		url := "/characters/" + req.Form["character"][0] + "/voted"
 		http.Redirect(w, req, url, 302)
