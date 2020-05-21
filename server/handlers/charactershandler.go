@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -44,8 +45,8 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 	if req.Form["isAnswered"][0] == "false" {
 		http.Redirect(w, req, "/form", 302)
 	} else {
-		//ここに投票処理がが入る
-		//client := new(http.Client)
+		//投票処理
+		client := new(http.Client)
 
 		u := &url.URL{}
 		u.Scheme = "http"
@@ -56,19 +57,11 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 		values := url.Values{}
 		values.Add("character", req.Form.Get("character"))
 
-		_, err := http.PostForm(uStr, values)
+		_, err := client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
 		if err != nil {
 			log.Println("client post err: ", err)
+			return
 		}
-
-		/*
-			res, err := client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
-			if err != nil {
-				log.Println("client post err: ", err)
-				return
-			}
-			defer res.Body.Close()
-		*/
 
 		url := "/characters/" + req.Form["character"][0] + "/voted"
 		http.Redirect(w, req, url, 302)
