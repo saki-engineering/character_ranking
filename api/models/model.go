@@ -9,7 +9,7 @@ import (
 // Vote 投票結果の構造体
 type Vote struct {
 	Chara string         `json:"character"`
-	User  sql.NullString `json:"user"`
+	User  sql.NullInt64  `json:"user"`
 	Time  sql.NullString `json:"time"`
 	IP    sql.NullString `json:"ip"`
 }
@@ -28,15 +28,30 @@ func ConnectDB() (*sql.DB, error) {
 
 // CreateTable 投票結果を入れるテーブルがなければ作る
 func CreateTable(db *sql.DB) error {
-	const createTable = `CREATE TABLE IF NOT EXISTS votes(
+	const createUserTable = `CREATE TABLE IF NOT EXISTS users(
+		id        INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+		age       INT NOT NULL,
+		gender    INT NOT NULL,
+		address   INT NOT NULL
+	);`
+	_, err := db.Exec(createUserTable)
+	if err != nil {
+		return err
+	}
+
+	const createVoteTable = `CREATE TABLE IF NOT EXISTS votes(
 		chara     VARCHAR(20) NOT NULL,
-		user      VARCHAR(100),
+		user      INT UNSIGNED,
 		time      DATETIME,
-		ip        VARCHAR(50)
+		ip        VARCHAR(50),
+		FOREIGN KEY (user) REFERENCES users (id)
 	);`
 
-	_, err := db.Exec(createTable)
-	return err
+	_, err2 := db.Exec(createVoteTable)
+	if err2 != nil {
+		return err2
+	}
+	return nil
 }
 
 // InsertVotes 指定キャラの投票データをDBに追加

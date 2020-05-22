@@ -22,7 +22,7 @@ func main() {
 	if err := models.CreateTable(db); err != nil {
 		log.Println("create table: ", err)
 	} else {
-		log.Println("success to create votes")
+		log.Println("success to create votes & users")
 	}
 
 	db.Close()
