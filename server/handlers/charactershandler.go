@@ -57,10 +57,15 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 		values := url.Values{}
 		values.Add("character", req.Form.Get("character"))
 		// user情報を付加する
-
-		_, err := client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
+		cookie, err := req.Cookie("user")
 		if err != nil {
-			log.Println("client post err: ", err)
+			log.Println("get cookie error: ", err)
+		}
+		values.Add("user", cookie.Value)
+
+		_, err1 := client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
+		if err1 != nil {
+			log.Println("client post err: ", err1)
 			return
 		}
 
