@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -49,7 +48,14 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 
 	b, err := ioutil.ReadAll(res.Body)
 	userID := string(b)
-	fmt.Println(string(b))
+
+	// ユーザー情報をcookieに付与
+	cookie := &http.Cookie{
+		Name:  "user",
+		Value: userID,
+		Path:  "/",
+	}
+	http.SetCookie(w, cookie)
 
 	//投票処理が入る
 	u := &url.URL{}
