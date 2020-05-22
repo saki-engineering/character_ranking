@@ -42,7 +42,7 @@ func CharacterDetailHandler(w http.ResponseWriter, req *http.Request) {
 func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
-	if req.Form["isAnswered"][0] == "false" {
+	if req.Form.Get("isAnswered") == "false" {
 		http.Redirect(w, req, "/form", 302)
 	} else {
 		//投票処理
@@ -69,7 +69,7 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		url := "/characters/" + req.Form["character"][0] + "/voted"
+		url := "/characters/" + req.Form.Get("character") + "/voted"
 		http.Redirect(w, req, url, 302)
 	}
 }

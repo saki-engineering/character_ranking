@@ -74,6 +74,6 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	url := "/characters/" + req.Form["character"][0] + "/voted"
+	url := "/characters/" + req.Form.Get("character") + "/voted"
 	http.Redirect(w, req, url, 302)
 }
