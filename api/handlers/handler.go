@@ -88,10 +88,12 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer db.Close()
 
-	err := models.InsertUsers(db, req.Form.Get("age"), req.Form.Get("gender"), req.Form.Get("address"))
+	id, err := models.InsertUsers(db, req.Form.Get("age"), req.Form.Get("gender"), req.Form.Get("address"))
 	if err != nil {
 		log.Println("insert: ", err)
 	} else {
-		log.Println("user insert success")
+		log.Println("user insert success, id:", id)
 	}
+	//fmt.Fprintf(w, string(id))
+	w.Write([]byte(string(id)))
 }

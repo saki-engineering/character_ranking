@@ -110,12 +110,17 @@ func GetCharaVoteData(db *sql.DB, chara string) ([]Vote, error) {
 }
 
 // InsertUsers 指定キャラの投票データをDBに追加
-func InsertUsers(db *sql.DB, age, gender, address string) error {
+func InsertUsers(db *sql.DB, age, gender, address string) (int64, error) {
 	const sqlStr = `INSERT INTO users(age, gender, address) VALUES (?, ?, ?);`
 
-	_, err := db.Exec(sqlStr, age, gender, address)
+	result, err := db.Exec(sqlStr, age, gender, address)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+
+	id, err2 := result.LastInsertId()
+	if err2 != nil {
+		return 0, err2
+	}
+	return id, nil
 }
