@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"app/models"
 
@@ -51,7 +52,7 @@ func VoteCharaHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Println("insert: ", err)
 	} else {
-		log.Println("insert success")
+		log.Println("vote insert success")
 	}
 }
 
@@ -94,6 +95,6 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 	} else {
 		log.Println("user insert success, id:", id)
 	}
-	//fmt.Fprintf(w, string(id))
-	w.Write([]byte(string(id)))
+	printid := strconv.FormatInt(id, 10)
+	fmt.Fprintf(w, printid)
 }
