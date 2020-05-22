@@ -56,6 +56,7 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 
 		values := url.Values{}
 		values.Add("character", req.Form.Get("character"))
+		// user情報を付加する
 
 		_, err := client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
 		if err != nil {

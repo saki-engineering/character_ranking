@@ -48,7 +48,7 @@ func VoteCharaHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer db.Close()
 
-	err := models.InsertVotes(db, req.Form.Get("character"))
+	err := models.InsertVotes(db, req.Form.Get("character"), req.Form.Get("user"))
 	if err != nil {
 		log.Println("insert: ", err)
 	} else {

@@ -48,7 +48,7 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 	defer res.Body.Close()
 
 	b, err := ioutil.ReadAll(res.Body)
-	//userID := string(b)
+	userID := string(b)
 	fmt.Println(string(b))
 
 	//投票処理が入る
@@ -60,6 +60,7 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 
 	values := url.Values{}
 	values.Add("character", req.Form.Get("character"))
+	values.Add("user", userID)
 
 	_, err = client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
 	if err != nil {
