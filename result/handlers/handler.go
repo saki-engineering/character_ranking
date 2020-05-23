@@ -5,6 +5,10 @@ import (
 	"log"
 	"net/http"
 	"text/template"
+
+	"app/models"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 //Page ... htmlに渡す値をまとめた構造体
@@ -42,6 +46,24 @@ func LoginPageHandler(w http.ResponseWriter, req *http.Request) {
 
 // LoginHandler /loginのPOSTハンドラ
 func LoginHandler(w http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+	db, e := models.ConnectDB()
+	if e != nil {
+		log.Fatal("connect DB: ", e)
+	}
+	defer db.Close()
+
+	user, err := models.GetUserData(db, req.Form.Get("userid"))
+	if err != nil {
+		log.Println("cannot get adminuser data: ", err)
+	} else {
+		err2 := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(req.Form.Get("password")))
+		if err2 != nil {
+			log.Println("password is not correct: ", err2)
+		} else {
+			log.Println("login success: userid=", user.UserID)
+		}
+	}
 	fmt.Fprintf(w, "Login POST")
 }
 
@@ -61,6 +83,19 @@ func SignupPageHandler(w http.ResponseWriter, req *http.Request) {
 
 // SignupHandler /signupのPOSTハンドラ
 func SignupHandler(w http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+	db, e := models.ConnectDB()
+	if e != nil {
+		log.Fatal("connect DB: ", e)
+	}
+	defer db.Close()
+
+	err := models.UserCreate(db, req.Form.Get("userid"), req.Form.Get("password"))
+	if err != nil {
+		log.Println("create admin user: ", err)
+	} else {
+		log.Println("success to create admin user")
+	}
 	fmt.Fprintf(w, "Signup POST")
 }
 

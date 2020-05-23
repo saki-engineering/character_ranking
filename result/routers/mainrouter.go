@@ -6,7 +6,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func createRouter() *mux.Router {
+// CreateRouter muxのルーターを作る
+func CreateRouter() *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/", handlers.RootHandler)
 	r.HandleFunc("/login", handlers.LoginPageHandler).Methods("GET")
