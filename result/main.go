@@ -17,6 +17,9 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", RootHandler)
 
+	fs := http.FileServer(http.Dir("./resources"))
+	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
+
 	r.Use(middlewares.Logging)
 
 	err := http.ListenAndServe(":"+port, r)
