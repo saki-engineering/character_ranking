@@ -56,7 +56,7 @@ func CreateTable(db *sql.DB) error {
 
 // InsertVotes 指定キャラの投票データをDBに追加
 func InsertVotes(db *sql.DB, chara, user string) error {
-	const sqlStr = `INSERT INTO votes(chara, user) VALUES (?, ?);`
+	const sqlStr = `INSERT INTO votes(chara, user, time) VALUES (?, ?, cast(now() as datetime));`
 
 	_, err := db.Exec(sqlStr, chara, user)
 	if err != nil {
