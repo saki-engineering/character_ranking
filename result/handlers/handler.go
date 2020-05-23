@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"text/template"
@@ -23,6 +24,25 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Fatal("Execute on RootHandler: ", err)
 	}
+}
+
+// LoginPageHandler /loginのGETハンドラ
+func LoginPageHandler(w http.ResponseWriter, req *http.Request) {
+	tmpl, err := loadTemplate("login")
+	if err != nil {
+		log.Fatal("ParseFiles: ", err)
+	}
+
+	page := Page{"View Result!"}
+	err = tmpl.Execute(w, page)
+	if err != nil {
+		log.Fatal("Execute on RootHandler: ", err)
+	}
+}
+
+// LoginHandler /loginのPOSTハンドラ
+func LoginHandler(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(w, "Login POST")
 }
 
 func loadTemplate(name string) (*template.Template, error) {
