@@ -45,6 +45,25 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "Login POST")
 }
 
+// SignupPageHandler /signupのGETハンドラ
+func SignupPageHandler(w http.ResponseWriter, req *http.Request) {
+	tmpl, err := loadTemplate("signup")
+	if err != nil {
+		log.Fatal("ParseFiles: ", err)
+	}
+
+	page := Page{"View Result!"}
+	err = tmpl.Execute(w, page)
+	if err != nil {
+		log.Fatal("Execute on RootHandler: ", err)
+	}
+}
+
+// SignupHandler /signupのPOSTハンドラ
+func SignupHandler(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(w, "Signup POST")
+}
+
 func loadTemplate(name string) (*template.Template, error) {
 	tmpl, err := template.ParseFiles(
 		"templates/"+name+".html",
