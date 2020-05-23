@@ -1,0 +1,35 @@
+package handlers
+
+import (
+	"log"
+	"net/http"
+	"text/template"
+)
+
+//Page ... htmlに渡す値をまとめた構造体
+type Page struct {
+	Title string
+}
+
+// RootHandler /のハンドラ
+func RootHandler(w http.ResponseWriter, req *http.Request) {
+	tmpl, err := loadTemplate("index")
+	if err != nil {
+		log.Fatal("ParseFiles: ", err)
+	}
+
+	page := Page{"View Result!"}
+	err = tmpl.Execute(w, page)
+	if err != nil {
+		log.Fatal("Execute on RootHandler: ", err)
+	}
+}
+
+func loadTemplate(name string) (*template.Template, error) {
+	tmpl, err := template.ParseFiles(
+		"templates/"+name+".html",
+		"templates/partials/_header.html",
+		"templates/partials/_footer.html",
+	)
+	return tmpl, err
+}
