@@ -2,9 +2,19 @@ $(function () {
     //いつもローカルストレージの中身を表示
     console.log(JSON.parse(localStorage.getItem("ranking")));
 
+    //basedayとの日付差を求める関数
+    function countDay() {
+        var today = new Date();
+        var baseday = new Date(2020, 5, 1);
+
+        var day = Math.ceil((today-baseday)/(60*60*24*1000));
+        return day
+    };
+
     //いつもローカルストレージがクリアされていたらrankingを付与する
     if (localStorage.getItem("ranking") == null) {
         var ranking = {
+            date: countDay(),
             age: 0,
             area: 99,
             fromCharaId: [],
@@ -15,7 +25,15 @@ $(function () {
             votingTodayHistory: []
         };
         localStorage.setItem("ranking", JSON.stringify(ranking));
-    };
+    } else { // 日を跨いでいたら、votingTodayHistoryをクリア
+        var ranking = JSON.parse(localStorage.getItem("ranking"));
+
+        if(ranking.date != countDay()){
+            ranking.date = countDay();
+            ranking.votingTodayHistory = [];
+            localStorage.setItem("ranking", JSON.stringify(ranking));
+        }
+    }
 
     //characterの投票ボタンを履歴に沿って無効化
     $(".btn-vote").each(function(i, obj) {
