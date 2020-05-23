@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"app/middlewares"
+
 	"github.com/gorilla/mux"
 )
 
@@ -14,6 +16,8 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", RootHandler)
+
+	r.Use(middlewares.Logging)
 
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
