@@ -16,6 +16,15 @@ services:
         depends_on:
             - mysql
 
+    result:
+        build: ./result
+        container_name: chara_result
+        ports:
+            - "7070:7070"
+        hostname: result_server
+        depends_on:
+            - mysql
+
     mysql:
         image: mysql:5.7
         container_name: chara_mysql
