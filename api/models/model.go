@@ -8,10 +8,10 @@ import (
 
 // Vote 投票結果の構造体
 type Vote struct {
-	Chara string         `json:"character"`
-	User  sql.NullInt64  `json:"user"`
-	Time  sql.NullString `json:"time"`
-	IP    sql.NullString `json:"ip"`
+	Chara       string         `json:"character"`
+	User        int            `json:"user"`
+	CreatedTime string         `json:"created_at"`
+	IP          sql.NullString `json:"ip"`
 }
 
 // ConnectDB DBと接続してポインタを返す
@@ -40,10 +40,10 @@ func CreateTable(db *sql.DB) error {
 	}
 
 	const createVoteTable = `CREATE TABLE IF NOT EXISTS votes(
-		chara     VARCHAR(20) NOT NULL,
-		user      INT UNSIGNED,
-		time      DATETIME,
-		ip        VARCHAR(50),
+		chara       VARCHAR(20) NOT NULL,
+		user        INT UNSIGNED NOT NULL,
+		created_at  DATETIME NOT NULL,
+		ip          VARCHAR(50),
 		FOREIGN KEY (user) REFERENCES users (id)
 	);`
 
@@ -56,7 +56,7 @@ func CreateTable(db *sql.DB) error {
 
 // InsertVotes 指定キャラの投票データをDBに追加
 func InsertVotes(db *sql.DB, chara, user string) error {
-	const sqlStr = `INSERT INTO votes(chara, user, time) VALUES (?, ?, cast(now() as datetime));`
+	const sqlStr = `INSERT INTO votes(chara, user, created_at) VALUES (?, ?, cast(now() as datetime));`
 
 	_, err := db.Exec(sqlStr, chara, user)
 	if err != nil {
@@ -78,7 +78,7 @@ func GetAllVoteData(db *sql.DB) ([]Vote, error) {
 	dataArray := make([]Vote, 0)
 	for rows.Next() {
 		var data Vote
-		err := rows.Scan(&data.Chara, &data.User, &data.Time, &data.IP)
+		err := rows.Scan(&data.Chara, &data.User, &data.CreatedTime, &data.IP)
 		if err != nil {
 			return nil, err
 		}
@@ -100,7 +100,7 @@ func GetCharaVoteData(db *sql.DB, chara string) ([]Vote, error) {
 	dataArray := make([]Vote, 0)
 	for rows.Next() {
 		var data Vote
-		err := rows.Scan(&data.Chara, &data.User, &data.Time, &data.IP)
+		err := rows.Scan(&data.Chara, &data.User, &data.CreatedTime, &data.IP)
 		if err != nil {
 			return nil, err
 		}
