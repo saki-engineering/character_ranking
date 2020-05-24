@@ -20,6 +20,9 @@ func CreateRouter() *mux.Router {
 	s1 := r.PathPrefix("/result").Subrouter()
 	s1.HandleFunc("", handlers.ResultRootHandler)
 
+	s2 := r.PathPrefix("/admin").Subrouter()
+	s2.HandleFunc("", handlers.AdminRootHandler)
+
 	r.Use(middlewares.Logging)
 	s1.Use(middlewares.AuthAdmin)
 
