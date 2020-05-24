@@ -123,6 +123,18 @@ func SignupHandler(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "Signup POST")
 }
 
+// LogoutHandler /logoutのハンドラ
+func LogoutHandler(w http.ResponseWriter, req *http.Request) {
+	session, err := stores.SessionStore.Get(req, stores.SessionName)
+	if err != nil {
+		log.Println("session cannot get: ", err)
+		return
+	}
+	delete(session.Values, "userid")
+	session.Save(req, w)
+	fmt.Fprintf(w, "logout")
+}
+
 func loadTemplate(name string) (*template.Template, error) {
 	tmpl, err := template.ParseFiles(
 		"templates/"+name+".html",
