@@ -13,9 +13,32 @@ import (
 
 //Page ... htmlに渡す値をまとめた構造体
 type Page struct {
-	Title  string
-	UserID string
-	LogIn  bool
+	Title     string
+	UserID    string
+	LogIn     bool
+	Character []VoteResult
+}
+
+// VoteResult キャラクターごとの得票数をまとめた構造体
+type VoteResult struct {
+	Name string
+	Vote int
+}
+
+var charas = []VoteResult{
+	VoteResult{"cinnamon", 0},
+	VoteResult{"cappuccino", 0},
+	VoteResult{"mocha", 0},
+	VoteResult{"chiffon", 0},
+	VoteResult{"espresso", 0},
+	VoteResult{"milk", 0},
+	VoteResult{"azuki", 0},
+	VoteResult{"coco", 0},
+	VoteResult{"nuts", 0},
+	VoteResult{"poron", 0},
+	VoteResult{"corne", 0},
+	VoteResult{"berry", 0},
+	VoteResult{"cherry", 0},
 }
 
 // RootHandler /のハンドラ
@@ -25,7 +48,10 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	page := Page{"View Result!", "", false}
+	page := new(Page)
+	page.Title = "View Result!"
+	page.UserID = ""
+	page.LogIn = false
 	session, e := stores.GetSession(req)
 	if e != nil {
 		log.Fatal("session cannot get: ", e)
@@ -49,7 +75,8 @@ func LoginPageHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	page := Page{"View Result!", "", false}
+	page := new(Page)
+	page.Title = "View Result!"
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on RootHandler: ", err)
@@ -98,7 +125,8 @@ func SignupPageHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	page := Page{"View Result!", "", false}
+	page := new(Page)
+	page.Title = "View Result!"
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on RootHandler: ", err)

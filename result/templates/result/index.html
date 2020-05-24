@@ -1,6 +1,14 @@
 {{template "header" .}}
 
-<h1>hello, world({{.Title}})</h1>
+<h1>hello,({{.UserID}})</h1>
+
+{{ range $v := .Character }}
+    <div class="card-body">
+        <h5 class="card-title">Name: {{$v.Name}} Vote: {{$v.Vote}}</h5>
+    </div>
+{{ end }}
+
+
 <button type="button" onclick="location.href='/'" class="btn btn-primary">戻る</button>
 
 {{template "footer"}}
