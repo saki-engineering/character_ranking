@@ -21,6 +21,6 @@ func SessionInit() {
 }
 
 // GetSession リクエストからセッションの取得
-func GetSession(req *http.Request) (*Session, error) {
+func GetSession(req *http.Request) (*sessions.Session, error) {
 	return SessionStore.Get(req, SessionName)
 }
