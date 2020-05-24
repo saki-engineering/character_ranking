@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"text/template"
@@ -67,12 +66,14 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	user, err := models.GetUserData(db, req.Form.Get("userid"))
 	if err != nil {
 		log.Println("cannot get adminuser data: ", err)
+		http.Redirect(w, req, "/login", http.StatusSeeOther)
 		return
 	}
 
 	err2 := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(req.Form.Get("password")))
 	if err2 != nil {
 		log.Println("password is not correct: ", err2)
+		http.Redirect(w, req, "/login", http.StatusSeeOther)
 		return
 	}
 
@@ -82,7 +83,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 
 	log.Println("login success: userid=", user.UserID)
 
-	fmt.Fprintf(w, "Login POST")
+	http.Redirect(w, req, "/", http.StatusSeeOther)
 }
 
 // SignupPageHandler /signupのGETハンドラ
@@ -114,7 +115,7 @@ func SignupHandler(w http.ResponseWriter, req *http.Request) {
 	} else {
 		log.Println("success to create admin user")
 	}
-	fmt.Fprintf(w, "Signup POST")
+	http.Redirect(w, req, "/", http.StatusSeeOther)
 }
 
 // LogoutHandler /logoutのハンドラ
@@ -122,7 +123,7 @@ func LogoutHandler(w http.ResponseWriter, req *http.Request) {
 	session := getSession(req)
 	delete(session.Values, "userid")
 	session.Save(req, w)
-	fmt.Fprintf(w, "logout")
+	http.Redirect(w, req, "/", http.StatusSeeOther)
 }
 
 func loadTemplate(name string) (*template.Template, error) {
