@@ -19,6 +19,8 @@ services:
     result:
         build: ./result
         container_name: chara_result
+        environment:
+            KARI_SESSION_KEY: supersecretsessionkeyfortest
         ports:
             - "7070:7070"
         hostname: result_server

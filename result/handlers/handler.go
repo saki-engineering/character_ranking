@@ -7,13 +7,16 @@ import (
 	"text/template"
 
 	"app/models"
+	"app/stores"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 //Page ... htmlに渡す値をまとめた構造体
 type Page struct {
-	Title string
+	Title  string
+	UserID string
+	LogIn  bool
 }
 
 // RootHandler /のハンドラ
@@ -23,7 +26,17 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	page := Page{"View Result!"}
+	page := Page{"View Result!", "", false}
+
+	session, err2 := stores.SessionStore.Get(req, stores.SessionName)
+	if err2 != nil {
+		log.Println("session cannot get: ", err2)
+	}
+	if userid, ok := session.Values["userid"].(string); ok {
+		page.UserID = userid
+		page.LogIn = true
+	}
+
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on RootHandler: ", err)
@@ -37,7 +50,7 @@ func LoginPageHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	page := Page{"View Result!"}
+	page := Page{"View Result!", "", false}
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on RootHandler: ", err)
@@ -56,14 +69,25 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	user, err := models.GetUserData(db, req.Form.Get("userid"))
 	if err != nil {
 		log.Println("cannot get adminuser data: ", err)
-	} else {
-		err2 := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(req.Form.Get("password")))
-		if err2 != nil {
-			log.Println("password is not correct: ", err2)
-		} else {
-			log.Println("login success: userid=", user.UserID)
-		}
+		return
 	}
+
+	err2 := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(req.Form.Get("password")))
+	if err2 != nil {
+		log.Println("password is not correct: ", err2)
+		return
+	}
+
+	session, err3 := stores.SessionStore.Get(req, stores.SessionName)
+	if err3 != nil {
+		log.Println("session cannot get: ", err3)
+		return
+	}
+	session.Values["userid"] = user.UserID
+	session.Save(req, w)
+
+	log.Println("login success: userid=", user.UserID)
+
 	fmt.Fprintf(w, "Login POST")
 }
 
@@ -74,7 +98,7 @@ func SignupPageHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	page := Page{"View Result!"}
+	page := Page{"View Result!", "", false}
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on RootHandler: ", err)

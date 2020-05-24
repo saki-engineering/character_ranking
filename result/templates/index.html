@@ -1,6 +1,9 @@
 {{template "header" .}}
 
 <h1>hello, world({{.Title}})</h1>
+{{if .LogIn}}
+    <h3>{{.UserID}}</h3>
+{{end}}
 <button type="button" onclick="location.href='/login'" class="btn btn-primary">login</button>
 <button type="button" onclick="location.href='/signup'" class="btn btn-primary">SignUp</button>
 
