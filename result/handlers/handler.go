@@ -8,7 +8,6 @@ import (
 	"app/models"
 	"app/stores"
 
-	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,7 +26,11 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	page := Page{"View Result!", "", false}
-	session := getSession(req)
+	session, e := stores.GetSession(req)
+	if e != nil {
+		log.Fatal("session cannot get: ", e)
+	}
+
 	if userid, ok := session.Values["userid"].(string); ok {
 		page.UserID = userid
 		page.LogIn = true
@@ -76,7 +79,10 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	session := getSession(req)
+	session, err3 := stores.GetSession(req)
+	if err3 != nil {
+		log.Fatal("session cannot get: ", err3)
+	}
 	session.Values["userid"] = user.UserID
 	session.Save(req, w)
 
@@ -119,7 +125,10 @@ func SignupHandler(w http.ResponseWriter, req *http.Request) {
 
 // LogoutHandler /logoutのハンドラ
 func LogoutHandler(w http.ResponseWriter, req *http.Request) {
-	session := getSession(req)
+	session, err := stores.GetSession(req)
+	if err != nil {
+		log.Fatal("session cannot get: ", err)
+	}
 	delete(session.Values, "userid")
 	session.Save(req, w)
 
@@ -133,12 +142,4 @@ func loadTemplate(name string) (*template.Template, error) {
 		"templates/partials/_footer.html",
 	)
 	return tmpl, err
-}
-
-func getSession(req *http.Request) *sessions.Session {
-	session, err := stores.SessionStore.Get(req, stores.SessionName)
-	if err != nil {
-		log.Fatal("session cannot get: ", err)
-	}
-	return session
 }

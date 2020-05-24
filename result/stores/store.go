@@ -1,6 +1,7 @@
 package stores
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/gorilla/sessions"
@@ -17,4 +18,9 @@ var (
 // SessionInit セッションストアを初期化する
 func SessionInit() {
 	SessionStore = sessions.NewCookieStore([]byte(os.Getenv("KARI_SESSION_KEY")))
+}
+
+// GetSession リクエストからセッションの取得
+func GetSession(req *http.Request) (*Session, error) {
+	return SessionStore.Get(req, SessionName)
 }
