@@ -27,7 +27,6 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	page := Page{"View Result!", "", false}
-
 	session := getSession(req)
 	if userid, ok := session.Values["userid"].(string); ok {
 		page.UserID = userid
@@ -123,6 +122,10 @@ func LogoutHandler(w http.ResponseWriter, req *http.Request) {
 	session := getSession(req)
 	delete(session.Values, "userid")
 	session.Save(req, w)
+
+	page.UserID = ""
+	page.LogIn = false
+
 	http.Redirect(w, req, "/", http.StatusSeeOther)
 }
 
