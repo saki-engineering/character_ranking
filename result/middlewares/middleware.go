@@ -14,3 +14,12 @@ func Logging(next http.Handler) http.Handler {
 		next.ServeHTTP(w, req)
 	})
 }
+
+// AuthAdmin ユーザーログインしているかどうかをチェック
+func AuthAdmin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		fmt.Printf("auth\n")
+
+		next.ServeHTTP(w, req)
+	})
+}

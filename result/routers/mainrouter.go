@@ -17,7 +17,11 @@ func CreateRouter() *mux.Router {
 	r.HandleFunc("/signup", handlers.SignupPageHandler).Methods("GET")
 	r.HandleFunc("/signup", handlers.SignupHandler).Methods("POST")
 
+	s1 := r.PathPrefix("/result").Subrouter()
+	s1.HandleFunc("", handlers.ResultRootHandler)
+
 	r.Use(middlewares.Logging)
+	s1.Use(middlewares.AuthAdmin)
 
 	return r
 }
