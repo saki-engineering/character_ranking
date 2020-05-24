@@ -46,3 +46,35 @@ func AuthAdmin(next http.Handler) http.Handler {
 		}
 	})
 }
+
+// AuthSuperAdmin 管理者ユーザーログインしているかどうかをチェック
+func AuthSuperAdmin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		session, err := stores.GetSession(req)
+		if err != nil {
+			log.Fatal("session cannot get: ", err)
+		}
+
+		db, e := models.ConnectDB()
+		if e != nil {
+			log.Fatal("connect DB: ", e)
+		}
+		defer db.Close()
+
+		var userid string
+		if id, ok := session.Values["userid"].(string); ok {
+			userid = id
+		}
+
+		user, err := models.GetUserData(db, userid)
+		if user.UserID != "" {
+			if user.Auth == 1 {
+				next.ServeHTTP(w, req)
+			} else {
+				http.Error(w, "Forbidden", http.StatusForbidden)
+			}
+		} else {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+		}
+	})
+}

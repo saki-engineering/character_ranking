@@ -25,6 +25,7 @@ func CreateRouter() *mux.Router {
 
 	r.Use(middlewares.Logging)
 	s1.Use(middlewares.AuthAdmin)
+	s2.Use(middlewares.AuthSuperAdmin)
 
 	return r
 }
