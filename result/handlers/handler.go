@@ -142,7 +142,12 @@ func SignupHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer db.Close()
 
-	err := models.UserCreate(db, req.Form.Get("userid"), req.Form.Get("password"))
+	auth := 0
+	if req.Form.Get("admin") == "on" {
+		auth = 1
+	}
+
+	err := models.UserCreate(db, req.Form.Get("userid"), req.Form.Get("password"), auth)
 	if err != nil {
 		log.Println("create admin user: ", err)
 	} else {

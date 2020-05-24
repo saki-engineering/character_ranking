@@ -42,14 +42,14 @@ func CreateTable(db *sql.DB) error {
 }
 
 // UserCreate adminuserのデータをDBに保存する
-func UserCreate(db *sql.DB, userid, password string) error {
+func UserCreate(db *sql.DB, userid, password string, auth int) error {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
 		return err
 	}
 
-	const sqlStr = `INSERT INTO adminusers(userid, hashedpassword, auth) VALUES (?, ?, 0);`
-	_, err2 := db.Exec(sqlStr, userid, hash)
+	const sqlStr = `INSERT INTO adminusers(userid, hashedpassword, auth) VALUES (?, ?, ?);`
+	_, err2 := db.Exec(sqlStr, userid, hash, auth)
 	if err2 != nil {
 		return err2
 	}
