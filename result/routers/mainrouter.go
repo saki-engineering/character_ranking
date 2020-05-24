@@ -2,6 +2,7 @@ package routers
 
 import (
 	"app/handlers"
+	"app/middlewares"
 
 	"github.com/gorilla/mux"
 )
@@ -15,6 +16,8 @@ func CreateRouter() *mux.Router {
 	r.HandleFunc("/logout", handlers.LogoutHandler)
 	r.HandleFunc("/signup", handlers.SignupPageHandler).Methods("GET")
 	r.HandleFunc("/signup", handlers.SignupHandler).Methods("POST")
+
+	r.Use(middlewares.Logging)
 
 	return r
 }

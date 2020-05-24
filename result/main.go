@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"app/middlewares"
 	"app/models"
 	"app/routers"
 	"app/stores"
@@ -19,8 +18,6 @@ func main() {
 
 	fs := http.FileServer(http.Dir("./resources"))
 	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
-
-	r.Use(middlewares.Logging)
 
 	db, e := models.ConnectDB()
 	if e != nil {
