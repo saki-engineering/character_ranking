@@ -11,6 +11,17 @@ import (
 
 // FormHandler フォームを表示
 func FormHandler(w http.ResponseWriter, req *http.Request) {
+	session, e := stores.GetSession(req)
+	if e != nil {
+		log.Fatal("session cannot get: ", e)
+	}
+
+	voting, _ := session.Values["voting"].(bool)
+	if !voting {
+		http.Redirect(w, req, "/", 302)
+		return
+	}
+
 	tmpl, err := loadTemplate("form")
 	if err != nil {
 		log.Fatal("ParseFiles: ", err)
@@ -57,6 +68,8 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("session cannot get: ", e)
 	}
 	session.Values["user"] = userID
+
+	delete(session.Values, "voting")
 	session.Save(req, w)
 
 	//投票処理が入る

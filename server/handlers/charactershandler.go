@@ -54,6 +54,9 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 
 	user, _ := session.Values["user"].(string)
 	if user == "" {
+		session.Values["voting"] = true
+		session.Save(req, w)
+
 		http.Redirect(w, req, "/form", 302)
 		return
 	}
