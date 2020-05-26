@@ -30,6 +30,19 @@ func main() {
 		log.Println("success to create adminuser table")
 	}
 
+	user, err2 := models.GetUserData(db, "admin")
+	if err2 != nil {
+		log.Println("fail to search user 'admin'")
+	}
+	if user.UserID != "admin" {
+		err3 := models.UserCreate(db, "admin", "admin", 1)
+		if err3 != nil {
+			log.Println("fail to create super admin user: ", err3)
+		} else {
+			log.Println("success to create super admin user")
+		}
+	}
+
 	db.Close()
 
 	stores.SessionInit()
