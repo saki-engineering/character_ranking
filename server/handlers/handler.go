@@ -6,28 +6,6 @@ import (
 	"text/template"
 )
 
-//Page ... htmlに渡す値をまとめた構造体
-type Page struct {
-	Title     string
-	Character []string
-}
-
-var charas = []string{
-	"cinnamon",
-	"cappuccino",
-	"mocha",
-	"chiffon",
-	"espresso",
-	"milk",
-	"azuki",
-	"coco",
-	"nuts",
-	"poron",
-	"corne",
-	"berry",
-	"cherry",
-}
-
 // ViewTopHandler /のハンドラ
 func ViewTopHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("index")
@@ -35,7 +13,8 @@ func ViewTopHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	page := Page{"Character rankinig!", charas}
+	page := new(Page)
+	page.Title = "Character rankinig!"
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
@@ -49,7 +28,8 @@ func ViewAboutHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	page := Page{"About", charas}
+	page := new(Page)
+	page.Title = "Character rankinig!"
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
@@ -63,7 +43,8 @@ func ViewFaqHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	page := Page{"FAQ", charas}
+	page := new(Page)
+	page.Title = "Character rankinig!"
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)

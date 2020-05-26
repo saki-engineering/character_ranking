@@ -15,7 +15,8 @@ func FormHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	page := Page{"form", charas}
+	page := new(Page)
+	page.Title = "form"
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)

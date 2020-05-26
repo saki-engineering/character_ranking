@@ -2,11 +2,11 @@
 
 <button type="button" onclick="location.href='/'" class="btn btn-primary">topに戻る</button>
 
-{{ range $i, $v := .Character }}
+{{ range $v := .Character }}
     <div class="card-body">
-        <h5 class="card-title">Entry No.{{$i}}, Name: {{$v}}</h5>
-        <button type="button" onclick="location.href='/characters/{{$v}}'" class="btn btn-info">みんなへのひとこと</button>
-        <button type="button" value="{{$v}}" class="btn btn-primary btn-vote">{{$v}}に投票</button>
+        <h5 class="card-title">Entry No.{{$v.ID}}, Name: {{$v.Name}}</h5>
+        <button type="button" onclick="location.href='/characters/{{$v.Name}}'" class="btn btn-info">みんなへのひとこと</button>
+        <button type="button" value="{{$v}}" class="btn btn-primary btn-vote">{{$v.Name}}に投票</button>
     </div>
 {{ end }}
 {{template "footer"}}

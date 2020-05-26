@@ -16,7 +16,9 @@ func CharacterHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	page := Page{"Characters!", charas}
+	page := new(Page)
+	page.Title = "Characters!"
+	page.Character = charas
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
@@ -31,7 +33,8 @@ func CharacterDetailHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	vars := mux.Vars(req)
-	page := Page{vars["name"], charas}
+	page := new(Page)
+	page.Title = vars["name"]
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
@@ -81,7 +84,8 @@ func CharacterVotedHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	page := Page{"form", charas}
+	page := new(Page)
+	page.Title = "Completed!"
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
