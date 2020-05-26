@@ -7,6 +7,7 @@ import (
 
 	"app/middlewares"
 	"app/routers"
+	"app/stores"
 )
 
 func main() {
@@ -19,6 +20,8 @@ func main() {
 	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
 
 	r.Use(middlewares.Logging)
+
+	stores.SessionInit()
 
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
