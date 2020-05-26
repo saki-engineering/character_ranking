@@ -60,7 +60,6 @@ $(function () {
 
         var form = `<form method='post' action='${url}' id='refresh' style='display: none;'>
                         <input type='hidden' name='character' value='${character}'>
-                        <input type='hidden' name='isAnswered' value='${isAnswered}'>
                     </form>`;
         $("body").append(form);
         $("#refresh").submit();

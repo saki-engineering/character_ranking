@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"strings"
 
+	"app/stores"
+
 	"github.com/gorilla/mux"
 )
 
@@ -45,36 +47,38 @@ func CharacterDetailHandler(w http.ResponseWriter, req *http.Request) {
 func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
-	if req.Form.Get("isAnswered") == "false" {
-		http.Redirect(w, req, "/form", 302)
-	} else {
-		//投票処理
-		client := new(http.Client)
-
-		u := &url.URL{}
-		u.Scheme = "http"
-		u.Host = "vote_api:9090"
-		u.Path = "/vote/"
-		uStr := u.String()
-
-		values := url.Values{}
-		values.Add("character", req.Form.Get("character"))
-		// user情報を付加する
-		cookie, err := req.Cookie("user")
-		if err != nil {
-			log.Println("get cookie error: ", err)
-		}
-		values.Add("user", cookie.Value)
-
-		_, err1 := client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
-		if err1 != nil {
-			log.Println("client post err: ", err1)
-			return
-		}
-
-		url := "/characters/" + req.Form.Get("character") + "/voted"
-		http.Redirect(w, req, url, 302)
+	session, e := stores.GetSession(req)
+	if e != nil {
+		log.Fatal("session cannot get: ", e)
 	}
+
+	user, _ := session.Values["user"].(string)
+	if user == "" {
+		http.Redirect(w, req, "/form", 302)
+		return
+	}
+
+	//投票処理
+	client := new(http.Client)
+
+	u := &url.URL{}
+	u.Scheme = "http"
+	u.Host = "vote_api:9090"
+	u.Path = "/vote/"
+	uStr := u.String()
+
+	values := url.Values{}
+	values.Add("character", req.Form.Get("character"))
+	values.Add("user", user)
+
+	_, err1 := client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
+	if err1 != nil {
+		log.Println("client post err: ", err1)
+		return
+	}
+
+	url := "/characters/" + req.Form.Get("character") + "/voted"
+	http.Redirect(w, req, url, 302)
 }
 
 // CharacterVotedHandler 投票終了後の画面を表示
