@@ -81,6 +81,11 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("session cannot get: ", err3)
 	}
 	session.Values["userid"] = user.UserID
+	if user.Auth == 1 {
+		session.Values["auth"] = true
+	} else {
+		session.Values["auth"] = false
+	}
 	session.Save(req, w)
 
 	log.Println("login success: userid=", user.UserID)
@@ -95,6 +100,7 @@ func LogoutHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("session cannot get: ", err)
 	}
 	delete(session.Values, "userid")
+	delete(session.Values, "auth")
 	session.Save(req, w)
 
 	http.Redirect(w, req, "/", http.StatusSeeOther)

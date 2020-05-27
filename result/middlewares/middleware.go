@@ -61,18 +61,9 @@ func AuthSuperAdmin(next http.Handler) http.Handler {
 		}
 		defer db.Close()
 
-		var userid string
-		if id, ok := session.Values["userid"].(string); ok {
-			userid = id
-		}
-
-		user, err := models.GetUserData(db, userid)
-		if user.UserID != "" {
-			if user.Auth == 1 {
-				next.ServeHTTP(w, req)
-			} else {
-				http.Error(w, "Forbidden", http.StatusForbidden)
-			}
+		auth, ok := session.Values["auth"].(bool)
+		if auth && ok {
+			next.ServeHTTP(w, req)
 		} else {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 		}

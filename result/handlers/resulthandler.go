@@ -54,7 +54,9 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 		charas[i].Vote = len(data)
 	}
 
-	page := Page{"View Result!", "", false, charas}
+	page := new(Page)
+	page.Title = "VIew Result!"
+	page.Character = charas
 	session, e := stores.GetSession(req)
 	if e != nil {
 		log.Fatal("session cannot get: ", e)
