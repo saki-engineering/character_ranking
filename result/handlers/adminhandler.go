@@ -23,7 +23,7 @@ func AdminRootHandler(w http.ResponseWriter, req *http.Request) {
 
 // CreateUserFormHandler /admin/userformのGETハンドラ
 func CreateUserFormHandler(w http.ResponseWriter, req *http.Request) {
-	tmpl, err := loadTemplate("signup")
+	tmpl, err := loadTemplate("admin/form")
 	if err != nil {
 		log.Fatal("ParseFiles: ", err)
 	}
