@@ -14,14 +14,14 @@ func CreateRouter() *mux.Router {
 	r.HandleFunc("/login", handlers.LoginPageHandler).Methods("GET")
 	r.HandleFunc("/login", handlers.LoginHandler).Methods("POST")
 	r.HandleFunc("/logout", handlers.LogoutHandler)
-	r.HandleFunc("/signup", handlers.SignupPageHandler).Methods("GET")
-	r.HandleFunc("/signup", handlers.SignupHandler).Methods("POST")
 
 	s1 := r.PathPrefix("/result").Subrouter()
 	s1.HandleFunc("", handlers.ResultRootHandler)
 
 	s2 := r.PathPrefix("/admin").Subrouter()
 	s2.HandleFunc("", handlers.AdminRootHandler)
+	s2.HandleFunc("/userform", handlers.CreateUserFormHandler).Methods("GET")
+	s2.HandleFunc("/userform", handlers.CreateUserHandler).Methods("POST")
 
 	r.Use(middlewares.Logging)
 	s1.Use(middlewares.AuthAdmin)
