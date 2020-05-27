@@ -4,9 +4,13 @@
 {{if .LogIn}}
     <h3>{{.UserID}}</h3>
     <button type="button" onclick="location.href='/logout'" class="btn btn-primary">logout</button>
+    <button type="button" onclick="location.href='/result'" class="btn btn-primary">Result</button>
 {{else}}
     <button type="button" onclick="location.href='/login'" class="btn btn-primary">login</button>
 {{end}}
-<button type="button" onclick="location.href='/admin'" class="btn btn-primary">Admin</button>
+
+{{if .Admin}}
+    <button type="button" onclick="location.href='/admin'" class="btn btn-primary">Admin</button>
+{{end}}
 
 {{template "footer"}}

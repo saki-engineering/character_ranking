@@ -22,6 +22,7 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 	page.Title = "View Result!"
 	page.UserID = ""
 	page.LogIn = false
+	page.Admin = false
 	session, e := stores.GetSession(req)
 	if e != nil {
 		log.Fatal("session cannot get: ", e)
@@ -30,6 +31,9 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 	if userid, ok := session.Values["userid"].(string); ok {
 		page.UserID = userid
 		page.LogIn = true
+	}
+	if auth, ok2 := session.Values["auth"].(bool); ok2 {
+		page.Admin = auth
 	}
 
 	err = tmpl.Execute(w, page)
