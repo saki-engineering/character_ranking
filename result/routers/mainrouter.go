@@ -22,6 +22,7 @@ func CreateRouter() *mux.Router {
 	s2.HandleFunc("", handlers.AdminRootHandler)
 	s2.HandleFunc("/userform", handlers.CreateUserFormHandler).Methods("GET")
 	s2.HandleFunc("/userform", handlers.CreateUserHandler).Methods("POST")
+	s2.HandleFunc("/newuser", handlers.CheckUserHandler)
 
 	r.Use(middlewares.Logging)
 	s1.Use(middlewares.AuthAdmin)

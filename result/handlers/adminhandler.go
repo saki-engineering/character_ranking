@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"app/models"
+	"app/stores"
 	"log"
 	"net/http"
 )
@@ -39,6 +40,15 @@ func CreateUserFormHandler(w http.ResponseWriter, req *http.Request) {
 // CreateUserHandler /admin/userformのPOSTハンドラ
 func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
+
+	session, err2 := stores.GetSession(req)
+	if err2 != nil {
+		log.Fatal("session cannot get: ", err2)
+	}
+	session.Values["newuserid"] = req.Form.Get("userid")
+	session.Values["newpassword"] = req.Form.Get("password")
+	session.Save(req, w)
+
 	db, e := models.ConnectDB()
 	if e != nil {
 		log.Fatal("connect DB: ", e)
@@ -56,5 +66,32 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 	} else {
 		log.Println("success to create admin user")
 	}
-	http.Redirect(w, req, "/", http.StatusSeeOther)
+	http.Redirect(w, req, "/admin/newuser", http.StatusSeeOther)
+}
+
+// CheckUserHandler /admin/newuserのハンドラ
+func CheckUserHandler(w http.ResponseWriter, req *http.Request) {
+	tmpl, err := loadTemplate("admin/newuser")
+	if err != nil {
+		log.Fatal("ParseFiles: ", err)
+	}
+
+	session, err2 := stores.GetSession(req)
+	if err2 != nil {
+		log.Fatal("session cannot get: ", err2)
+	}
+
+	page := new(Page)
+	page.Title = "View Result!"
+	page.NewUser.UserID, _ = session.Values["newuserid"].(string)
+	page.NewUser.Password, _ = session.Values["newpassword"].(string)
+
+	err = tmpl.Execute(w, page)
+	if err != nil {
+		log.Fatal("Execute on RootHandler: ", err)
+	}
+
+	delete(session.Values, "newuserid")
+	delete(session.Values, "newpassword")
+	session.Save(req, w)
 }

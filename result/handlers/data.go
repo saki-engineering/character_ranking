@@ -7,6 +7,7 @@ type Page struct {
 	LogIn     bool
 	Admin     bool
 	Character []VoteResult
+	NewUser   NewAdmin
 }
 
 // VoteResult キャラクターごとの得票数をまとめた構造体
@@ -14,6 +15,13 @@ type VoteResult struct {
 	ID   int
 	Name string
 	Vote int
+}
+
+// NewAdmin 新規作成したユーザーの情報
+type NewAdmin struct {
+	UserID   string
+	Password string
+	Auth     bool
 }
 
 var charas = []VoteResult{

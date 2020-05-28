@@ -1,0 +1,19 @@
+{{template "header" .}}
+
+<h1>hello,({{.UserID}})</h1>
+
+<form>
+  <div class="form-group">
+    <label for="showUserID">UserID</label>
+    <input type="email" class="form-control" value="{{.NewUser.UserID}}" id="showUserID" disabled>
+  </div>
+  <div class="form-group">
+    <label for="showPassword">Password</label>
+    <input type="password" class="form-control" id="showPassword" value="{{.NewUser.Password}}" disabled>
+  </div>
+  <button type="button" class="btn btn-primary" id="togglePassword">パスワードを表示</button>
+</form>
+
+<button type="button" onclick="location.href='/'" class="btn btn-primary">戻る</button>
+
+{{template "footer"}}
