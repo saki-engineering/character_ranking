@@ -37,6 +37,7 @@ func CharacterDetailHandler(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	page := new(Page)
 	page.Title = vars["name"]
+	page.Description = desp[vars["name"]]
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
