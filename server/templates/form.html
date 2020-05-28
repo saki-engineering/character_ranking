@@ -4,11 +4,10 @@
   <div class="form-group">
     <label for="form-age">年齢</label>
     <select class="form-control" name="age" id="form-age" required>
-      <option value="1" selected>1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5">5</option>
+      <option value="0" selected>0</option>
+      {{ range $v := .Age }}
+        <option value="{{$v}}">{{$v}}</option>
+      {{ end }}
     </select>
   </div>
   <div class="form-group">
@@ -24,10 +23,9 @@
     <label for="form-address">お住いの都道府県</label>
     <select class="form-control" name="address" id="form-address" required>
       <option value="">(選択してください)</option>
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
+      {{ range $v := .Prefecture }}
+        <option value="{{$v.Code}}">{{$v.Name}}</option>
+      {{ end }}
     </select>
   </div>
   <div class="form-group form-check">

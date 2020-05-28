@@ -27,8 +27,15 @@ func FormHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
+	age := make([]int, 99)
+	for i := 0; i < 99; i++ {
+		age[i] = i + 1
+	}
+
 	page := new(Page)
 	page.Title = "form"
+	page.Prefecture = prefecture
+	page.Age = age
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
