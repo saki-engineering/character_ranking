@@ -1,5 +1,19 @@
 {{template "header" .}}
 
-<h1>{{.Title}}</h1>
+<h1 class="text-center">{{.Title}}</h1>
+<h4 class="text-center">~わたしの想い、あのコに届け~</h4>
+
+<div class="row">
+    <div class="col-3">
+        <button type="button" onclick="location.href='/characters'" class="btn btn-primary">投票する！</button>
+    </div>
+</div>
+
+<div class="mx-auto">
+    <ul class="list-group">
+    <li class="list-group-item text-center">お知らせ</li>
+    <li class="list-group-item">2020/4/10 投票を開始しました</li>
+    </ul>
+</div>
 
 {{template "footer"}}
