@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"text/template"
 
 	"app/models"
@@ -108,6 +110,26 @@ func LogoutHandler(w http.ResponseWriter, req *http.Request) {
 	session.Save(req, w)
 
 	http.Redirect(w, req, "/", http.StatusSeeOther)
+}
+
+// CheckIDHandler /checkidのPOSTハンドラ
+func CheckIDHandler(w http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+
+	db, e := models.ConnectDB()
+	if e != nil {
+		log.Fatal("connect DB: ", e)
+	}
+	defer db.Close()
+
+	cnt, err := models.CheckIDExist(db, req.Form.Get("userid"))
+	if err != nil {
+		log.Println("checkIDExxist: ", err)
+	}
+
+	printnum := strconv.FormatInt(int64(cnt), 10)
+
+	fmt.Fprintf(w, printnum)
 }
 
 func loadTemplate(name string) (*template.Template, error) {

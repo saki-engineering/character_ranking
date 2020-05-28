@@ -77,3 +77,24 @@ func GetUserData(db *sql.DB, userid string) (AdminUser, error) {
 
 	return user, nil
 }
+
+// CheckIDExist 与えられたuseridの管理者データを探す
+func CheckIDExist(db *sql.DB, userid string) (int, error) {
+	const sqlStr = `SELECT COUNT(*) FROM adminusers WHERE userid=?;`
+	cnt := 1
+
+	rows, err := db.Query(sqlStr, userid)
+	if err != nil {
+		return cnt, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		e := rows.Scan(&cnt)
+		if e != nil {
+			return cnt, e
+		}
+	}
+
+	return cnt, nil
+}
