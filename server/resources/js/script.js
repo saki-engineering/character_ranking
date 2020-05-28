@@ -1,7 +1,4 @@
 $(function () {
-    //いつもローカルストレージの中身を表示
-    console.log(JSON.parse(localStorage.getItem("ranking")));
-
     //basedayとの日付差を求める関数
     function countDay() {
         var today = new Date();
@@ -20,7 +17,6 @@ $(function () {
             fromCharaId: [],
             gender: 9,
             idAnswered: false,
-            user: "",
             votingHistory: [],
             votingTodayHistory: []
         };
