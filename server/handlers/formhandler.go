@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 )
 
@@ -83,6 +84,9 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 	u := &url.URL{}
 	u.Scheme = "http"
 	u.Host = "vote_api:9090"
+	if apiURL := os.Getenv("API_URL"); apiURL != "" {
+		u.Host = apiURL + ":9090"
+	}
 	u.Path = "/vote/"
 	uStr := u.String()
 

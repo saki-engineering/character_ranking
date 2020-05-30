@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
@@ -19,10 +20,17 @@ func ConnectDB() (*sql.DB, error) {
 	dbDriver := "mysql"
 	dbUser := "root"
 	dbPass := "pass"
+	dbAddress := "mysql"
 	dbName := "sampledb"
 
+	if os.Getenv("DB_ENV") == "production" {
+		dbUser := os.Getenv("DB_USER")
+		dbPass := os.Getenv("DB_PASS")
+		dbAddress := os.Getenv("DB_ADDRESS")
+	}
+
 	//db, e := sql.Open("mysql", "root:pass@tcp(mysql:3306)/sampledb")
-	db, e := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp(mysql:3306)/"+dbName)
+	db, e := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp("+dbAddress+":3306)/"+dbName)
 	return db, e
 }
 
