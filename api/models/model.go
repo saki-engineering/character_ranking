@@ -24,9 +24,9 @@ func ConnectDB() (*sql.DB, error) {
 	dbName := "sampledb"
 
 	if os.Getenv("DB_ENV") == "production" {
-		dbUser := os.Getenv("DB_USER")
-		dbPass := os.Getenv("DB_PASS")
-		dbAddress := os.Getenv("DB_ADDRESS")
+		dbUser = os.Getenv("DB_USER")
+		dbPass = os.Getenv("DB_PASS")
+		dbAddress = os.Getenv("DB_ADDRESS")
 	}
 
 	//db, e := sql.Open("mysql", "root:pass@tcp(mysql:3306)/sampledb")
