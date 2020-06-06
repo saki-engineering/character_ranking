@@ -44,5 +44,13 @@ services:
         volumes:
             - db-volume:/var/lib/mysql
 
+    redis:
+        image: "redis:latest"
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis-volume:/data
+
 volumes:
     db-volume:
+    redis-volume:
