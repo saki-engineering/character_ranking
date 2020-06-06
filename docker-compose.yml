@@ -3,8 +3,6 @@ services:
     web_server:
         build: ./server
         container_name: chara_web_server
-        environment:
-            KARI_SESSION_KEY: supersecretsessionkeyfortest
         ports: 
             - "8080:8080"
         hostname: web-server
@@ -21,8 +19,6 @@ services:
     result:
         build: ./result
         container_name: chara_result
-        environment:
-            KARI_SESSION_KEY: supersecretsessionkeyfortest
         ports:
             - "7070:7070"
         hostname: result_server
