@@ -2,6 +2,7 @@ package routers
 
 import (
 	"app/handlers"
+	"app/middlewares"
 
 	"github.com/gorilla/mux"
 )
@@ -22,6 +23,8 @@ func CreateRouter() *mux.Router {
 	s2 := r.PathPrefix("/form").Subrouter()
 	s2.HandleFunc("", handlers.FormHandler)
 	s2.HandleFunc("/vote", handlers.FormVoteHandler).Methods("POST")
+
+	r.Use(middlewares.Logging)
 
 	return r
 }
