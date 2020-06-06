@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 )
 
@@ -49,14 +48,7 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 	//ここにuser登録処理
 	client := new(http.Client)
 
-	u1 := &url.URL{}
-	u1.Scheme = "http"
-	u1.Host = "vote_api:9090"
-	if apiURL := os.Getenv("API_URL"); apiURL != "" {
-		u1.Host = apiURL + ":9090"
-	}
-	u1.Path = "/user/"
-	uStr1 := u1.String()
+	uStr1 := apiURLString("/user/")
 
 	values1 := url.Values{}
 	values1.Add("age", req.Form.Get("age"))
@@ -84,14 +76,7 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 	session.Save(req, w)
 
 	//投票処理が入る
-	u := &url.URL{}
-	u.Scheme = "http"
-	u.Host = "vote_api:9090"
-	if apiURL := os.Getenv("API_URL"); apiURL != "" {
-		u.Host = apiURL + ":9090"
-	}
-	u.Path = "/vote/"
-	uStr := u.String()
+	uStr := apiURLString("/vote/")
 
 	values := url.Values{}
 	values.Add("character", req.Form.Get("character"))

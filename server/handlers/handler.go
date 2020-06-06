@@ -3,7 +3,6 @@ package handlers
 import (
 	"log"
 	"net/http"
-	"text/template"
 )
 
 // ViewTopHandler /のハンドラ
@@ -49,13 +48,4 @@ func ViewFaqHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
 	}
-}
-
-func loadTemplate(name string) (*template.Template, error) {
-	tmpl, err := template.ParseFiles(
-		"templates/"+name+".html",
-		"templates/partials/_header.html",
-		"templates/partials/_footer.html",
-	)
-	return tmpl, err
 }

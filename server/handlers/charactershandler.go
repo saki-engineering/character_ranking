@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 
 	"app/stores"
@@ -66,14 +65,7 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 	//投票処理
 	client := new(http.Client)
 
-	u := &url.URL{}
-	u.Scheme = "http"
-	u.Host = "vote_api:9090"
-	if apiURL := os.Getenv("API_URL"); apiURL != "" {
-		u.Host = apiURL + ":9090"
-	}
-	u.Path = "/vote/"
-	uStr := u.String()
+	uStr := apiURLString("/vote/")
 
 	values := url.Values{}
 	values.Add("character", req.Form.Get("character"))
