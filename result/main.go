@@ -7,7 +7,6 @@ import (
 
 	"app/models"
 	"app/routers"
-	"app/stores"
 )
 
 func main() {
@@ -44,8 +43,6 @@ func main() {
 	}
 
 	db.Close()
-
-	stores.SessionInit()
 
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {

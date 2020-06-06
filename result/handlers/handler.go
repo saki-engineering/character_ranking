@@ -24,17 +24,20 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 	page.UserID = ""
 	page.LogIn = false
 	page.Admin = false
-	session, e := stores.GetSession(req)
+	conn, e := stores.ConnectRedis()
 	if e != nil {
-		log.Fatal("session cannot get: ", e)
+		log.Fatal("cannot connect redis: ", e)
 	}
+	defer conn.Close()
+	sessionID, _ := stores.GetSessionID(req)
 
-	if userid, ok := session.Values["userid"].(string); ok {
+	if userid, _ := stores.GetSessionValue(sessionID, "userid", conn); userid != "" {
 		page.UserID = userid
 		page.LogIn = true
 	}
-	if auth, ok2 := session.Values["auth"].(bool); ok2 {
-		page.Admin = auth
+
+	if auth, _ := stores.GetSessionValue(sessionID, "auth", conn); auth == "true" {
+		page.Admin = true
 	}
 
 	err = tmpl.Execute(w, page)
@@ -81,17 +84,19 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	session, err3 := stores.GetSession(req)
+	conn, err3 := stores.ConnectRedis()
 	if err3 != nil {
-		log.Fatal("session cannot get: ", err3)
+		log.Fatal("cannot connect redis: ", err3)
 	}
-	session.Values["userid"] = user.UserID
+	defer conn.Close()
+	sessionID, _ := stores.GetSessionID(req)
+
+	stores.SetSessionValue(sessionID, "userid", user.UserID, conn)
 	if user.Auth == 1 {
-		session.Values["auth"] = true
+		stores.SetSessionValue(sessionID, "auth", "true", conn)
 	} else {
-		session.Values["auth"] = false
+		stores.SetSessionValue(sessionID, "auth", "false", conn)
 	}
-	session.Save(req, w)
 
 	log.Println("login success: userid=", user.UserID)
 
@@ -100,13 +105,15 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 
 // LogoutHandler /logoutのハンドラ
 func LogoutHandler(w http.ResponseWriter, req *http.Request) {
-	session, err := stores.GetSession(req)
+	conn, err := stores.ConnectRedis()
 	if err != nil {
-		log.Fatal("session cannot get: ", err)
+		log.Fatal("cannot connect redis: ", err)
 	}
-	delete(session.Values, "userid")
-	delete(session.Values, "auth")
-	session.Save(req, w)
+	defer conn.Close()
+	sessionID, _ := stores.GetSessionID(req)
+
+	stores.DeleteSessionValue(sessionID, "userid", conn)
+	stores.DeleteSessionValue(sessionID, "auth", conn)
 
 	http.Redirect(w, req, "/", http.StatusSeeOther)
 }

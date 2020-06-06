@@ -26,6 +26,7 @@ func CreateRouter() *mux.Router {
 	s2.HandleFunc("/newuser", handlers.CheckUserHandler)
 
 	r.Use(middlewares.Logging)
+	r.Use(middlewares.CheckSessionID)
 	s1.Use(middlewares.AuthAdmin)
 	s2.Use(middlewares.AuthSuperAdmin)
 

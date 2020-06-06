@@ -41,13 +41,15 @@ func CreateUserFormHandler(w http.ResponseWriter, req *http.Request) {
 func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
-	session, err2 := stores.GetSession(req)
+	conn, err2 := stores.ConnectRedis()
 	if err2 != nil {
-		log.Fatal("session cannot get: ", err2)
+		log.Fatal("cannot connect redis: ", err2)
 	}
-	session.Values["newuserid"] = req.Form.Get("userid")
-	session.Values["newpassword"] = req.Form.Get("password")
-	session.Save(req, w)
+	defer conn.Close()
+	sessionID, _ := stores.GetSessionID(req)
+
+	stores.SetSessionValue(sessionID, "newuserid", req.Form.Get("userid"), conn)
+	stores.SetSessionValue(sessionID, "newpassword", req.Form.Get("password"), conn)
 
 	db, e := models.ConnectDB()
 	if e != nil {
@@ -76,22 +78,23 @@ func CheckUserHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ParseFiles: ", err)
 	}
 
-	session, err2 := stores.GetSession(req)
+	conn, err2 := stores.ConnectRedis()
 	if err2 != nil {
-		log.Fatal("session cannot get: ", err2)
+		log.Fatal("cannot connect redis: ", err2)
 	}
+	defer conn.Close()
+	sessionID, _ := stores.GetSessionID(req)
 
 	page := new(Page)
 	page.Title = "View Result!"
-	page.NewUser.UserID, _ = session.Values["newuserid"].(string)
-	page.NewUser.Password, _ = session.Values["newpassword"].(string)
+	page.NewUser.UserID, _ = stores.GetSessionValue(sessionID, "newuserid", conn)
+	page.NewUser.Password, _ = stores.GetSessionValue(sessionID, "newpassword", conn)
 
 	err = tmpl.Execute(w, page)
 	if err != nil {
 		log.Fatal("Execute on RootHandler: ", err)
 	}
 
-	delete(session.Values, "newuserid")
-	delete(session.Values, "newpassword")
-	session.Save(req, w)
+	stores.DeleteSessionValue(sessionID, "newuserid", conn)
+	stores.DeleteSessionValue(sessionID, "newpassword", conn)
 }

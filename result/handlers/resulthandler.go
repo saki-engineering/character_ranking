@@ -51,12 +51,15 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 	page := new(Page)
 	page.Title = "VIew Result!"
 	page.Character = charas
-	session, e := stores.GetSession(req)
-	if e != nil {
-		log.Fatal("session cannot get: ", e)
-	}
 
-	if userid, ok := session.Values["userid"].(string); ok {
+	conn, e := stores.ConnectRedis()
+	if e != nil {
+		log.Fatal("cannot connect redis: ", e)
+	}
+	defer conn.Close()
+	sessionID, _ := stores.GetSessionID(req)
+
+	if userid, _ := stores.GetSessionValue(sessionID, "userid", conn); userid != "" {
 		page.UserID = userid
 		page.LogIn = true
 	}
