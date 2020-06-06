@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"text/template"
 
 	"app/models"
 	"app/stores"
@@ -130,13 +129,4 @@ func CheckIDHandler(w http.ResponseWriter, req *http.Request) {
 	printnum := strconv.FormatInt(int64(cnt), 10)
 
 	fmt.Fprintf(w, printnum)
-}
-
-func loadTemplate(name string) (*template.Template, error) {
-	tmpl, err := template.ParseFiles(
-		"templates/"+name+".html",
-		"templates/partials/_header.html",
-		"templates/partials/_footer.html",
-	)
-	return tmpl, err
 }

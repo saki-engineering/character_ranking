@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
-	"os"
 )
 
 // Vote 投票結果の構造体
@@ -28,16 +26,8 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 
 	client := new(http.Client)
 
-	u := &url.URL{}
-	u.Scheme = "http"
-	u.Host = "vote_api:9090"
-	if apiURL := os.Getenv("API_URL"); apiURL != "" {
-		u.Host = apiURL + ":9090"
-	}
-	u.Path = "/vote/"
 	for i, chara := range charas {
-		u.Path = "/vote/" + chara.Name
-		uStr := u.String()
+		uStr := apiURLString("/vote/" + chara.Name)
 
 		res, e := client.Get(uStr)
 		if e != nil {
