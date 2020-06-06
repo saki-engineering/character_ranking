@@ -5,7 +5,7 @@ COPY . .
 
 RUN go get -u github.com/gorilla/mux \
 &&  go get github.com/gomodule/redigo/redis \
-&&  go get -u github.com/gorilla/sessions
+&&  go get github.com/google/uuid
 #RUN go get -d -v ./...
 #RUN go install -v ./...
 

@@ -7,8 +7,6 @@ import (
 
 	"app/routers"
 	"app/stores"
-
-	"github.com/gomodule/redigo/redis"
 )
 
 func main() {
@@ -20,9 +18,7 @@ func main() {
 	fs := http.FileServer(http.Dir("./resources"))
 	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
 
-	stores.SessionInit()
-
-	conn, e := redis.Dial("tcp", "redis:6379")
+	conn, e := stores.ConnectRedis()
 	if e != nil {
 		log.Fatal("cannot connect redis: ", e)
 	} else {

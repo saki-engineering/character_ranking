@@ -1,24 +1,27 @@
 package handlers
 
 import (
-	"app/stores"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"app/stores"
 )
 
 // FormHandler フォームを表示
 func FormHandler(w http.ResponseWriter, req *http.Request) {
-	session, e := stores.GetSession(req)
+	conn, e := stores.ConnectRedis()
 	if e != nil {
-		log.Fatal("session cannot get: ", e)
+		log.Fatal("cannot connect redis: ", e)
 	}
+	defer conn.Close()
+	sessionID, _ := stores.GetSessionID(req)
 
-	voting, _ := session.Values["voting"].(bool)
-	if !voting {
-		http.Redirect(w, req, "/", 302)
+	voting, _ := stores.GetSessionValue(sessionID, "voting", conn)
+	if voting != "true" {
+		http.Redirect(w, req, "/", http.StatusSeeOther)
 		return
 	}
 
@@ -66,14 +69,15 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 	userID := string(b)
 
 	// ユーザー情報をsessionに付与
-	session, e := stores.GetSession(req)
+	conn, e := stores.ConnectRedis()
 	if e != nil {
-		log.Fatal("session cannot get: ", e)
+		log.Fatal("cannot connect redis: ", e)
 	}
-	session.Values["user"] = userID
+	defer conn.Close()
+	sessionID, _ := stores.GetSessionID(req)
 
-	delete(session.Values, "voting")
-	session.Save(req, w)
+	stores.SetSessionValue(sessionID, "user", userID, conn)
+	stores.DeleteSessionValue(sessionID, "voting", conn)
 
 	//投票処理が入る
 	uStr := apiURLString("/vote/")
@@ -89,5 +93,5 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	url := "/characters/" + req.Form.Get("character") + "/voted"
-	http.Redirect(w, req, url, 302)
+	http.Redirect(w, req, url, http.StatusSeeOther)
 }

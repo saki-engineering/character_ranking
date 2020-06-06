@@ -25,6 +25,7 @@ func CreateRouter() *mux.Router {
 	s2.HandleFunc("/vote", handlers.FormVoteHandler).Methods("POST")
 
 	r.Use(middlewares.Logging)
+	r.Use(middlewares.CheckSessionID)
 
 	return r
 }
