@@ -26,20 +26,20 @@ func GetSessionID(req *http.Request) (string, error) {
 }
 
 // GetSessionValue セッションIDとkeyからvalueを取得
-func GetSessionValue(sessionID, key string, conn redis.Conn) (string, error) {
+func GetSessionValue(sessionID, field string, conn redis.Conn) (string, error) {
 	// errがnilでないならvalueは空文字列になる
-	value, err := redis.String(conn.Do("HGET", sessionID, key))
+	value, err := redis.String(conn.Do("HGET", sessionID, field))
 	return value, err
 }
 
-// SetSessionValue セッションIDを受け取って、(key,value)の組をセット
-func SetSessionValue(sessionID, key, value string, conn redis.Conn) error {
-	_, err := conn.Do("HSET", sessionID, key, value)
+// SetSessionValue セッションIDを受け取って、(field,value)の組をセット
+func SetSessionValue(sessionID, field, value string, conn redis.Conn) error {
+	_, err := conn.Do("HSET", sessionID, field, value)
 	return err
 }
 
-// DeleteSessionValue セッションIDを受け取って、keyを削除
-func DeleteSessionValue(sessionID, key string, conn redis.Conn) error {
-	_, err := conn.Do("HDEL", sessionID, key)
+// DeleteSessionValue セッションIDを受け取って、fieldを削除
+func DeleteSessionValue(sessionID, field string, conn redis.Conn) error {
+	_, err := conn.Do("HDEL", sessionID, field)
 	return err
 }
