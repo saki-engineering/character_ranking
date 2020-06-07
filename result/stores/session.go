@@ -34,7 +34,10 @@ func GetSessionValue(sessionID, field string, conn redis.Conn) (string, error) {
 
 // SetSessionValue セッションIDを受け取って、(field,value)の組をセット
 func SetSessionValue(sessionID, field, value string, conn redis.Conn) error {
+	ttl := 86400
+
 	_, err := conn.Do("HSET", sessionID, field, value)
+	conn.Do("EXPIRE", sessionID, ttl)
 	return err
 }
 
