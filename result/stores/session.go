@@ -1,9 +1,12 @@
 package stores
 
 import (
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/gomodule/redigo/redis"
+	"github.com/google/uuid"
 )
 
 var (
@@ -23,6 +26,21 @@ func GetSessionID(req *http.Request) (string, error) {
 		return "", err
 	}
 	return cookie.Value, nil
+}
+
+// SetSessionID セッションIDを生成して、cookieにセットする
+func SetSessionID(w http.ResponseWriter) {
+	uuid, err := uuid.NewRandom()
+	if err != nil {
+		log.Println("cannot make uuid: ", err)
+	}
+
+	cookie := &http.Cookie{
+		Name:    stores.SessionName,
+		Value:   uuid.String(),
+		Expires: time.Now().AddDate(1, 0, 0),
+	}
+	http.SetCookie(w, cookie)
 }
 
 // GetSessionValue セッションIDとkeyからvalueを取得

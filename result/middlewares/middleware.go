@@ -4,12 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"app/models"
 	"app/stores"
-
-	"github.com/google/uuid"
 )
 
 // Logging アクセス時にリクエスト内容をロギング
@@ -28,16 +25,7 @@ func CheckSessionID(next http.Handler) http.Handler {
 		id, err := stores.GetSessionID(req)
 
 		if err != nil || id == "" {
-			uuid, err2 := uuid.NewRandom()
-			if err2 != nil {
-				log.Println("cannot make uuid: ", err2)
-			}
-			cookie := &http.Cookie{
-				Name:    stores.SessionName,
-				Value:   uuid.String(),
-				Expires: time.Now().AddDate(0, 0, 7),
-			}
-			http.SetCookie(w, cookie)
+			stores.SetSessionID(w)
 		}
 
 		next.ServeHTTP(w, req)
