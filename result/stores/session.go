@@ -66,6 +66,13 @@ func SetSessionValue(sessionID, field, value string, conn redis.Conn) error {
 	return err
 }
 
+// DeleteOldSessionID 指定のセッションIDをredisから削除
+// 削除できなかった場合は返り値エラーが返る
+func DeleteOldSessionID(sessionID string, conn redis.Conn) error {
+	_, err := conn.Do("DEL", sessionID)
+	return err
+}
+
 // DeleteSessionValue セッションIDを受け取って、fieldを削除
 // 削除できなかった場合は返り値にエラーが返る
 func DeleteSessionValue(sessionID, field string, conn redis.Conn) error {

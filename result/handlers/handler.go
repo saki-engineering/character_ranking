@@ -88,13 +88,16 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("cannot connect redis: ", err3)
 	}
 	defer conn.Close()
-	sessionID, _ := stores.GetSessionID(req)
+	oldSessionID, _ := stores.GetSessionID(req)
 
-	stores.SetSessionValue(sessionID, "userid", user.UserID, conn)
+	stores.DeleteOldSessionID(oldSessionID, conn)
+	newSessionID := stores.SetSessionID(w)
+
+	stores.SetSessionValue(newSessionID, "userid", user.UserID, conn)
 	if user.Auth == 1 {
-		stores.SetSessionValue(sessionID, "auth", "true", conn)
+		stores.SetSessionValue(newSessionID, "auth", "true", conn)
 	} else {
-		stores.SetSessionValue(sessionID, "auth", "false", conn)
+		stores.SetSessionValue(newSessionID, "auth", "false", conn)
 	}
 
 	log.Println("login success: userid=", user.UserID)
