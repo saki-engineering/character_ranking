@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	"app/models"
 	"app/stores"
@@ -128,12 +127,17 @@ func CheckIDHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer db.Close()
 
-	cnt, err := models.CheckIDExist(db, req.Form.Get("userid"))
+	exist, err := models.CheckIDExist(db, req.Form.Get("userid"))
 	if err != nil {
 		log.Println("checkIDExxist: ", err)
 	}
 
-	printnum := strconv.FormatInt(int64(cnt), 10)
+	var printnum string
+	if exist {
+		printnum = "1"
+	} else {
+		printnum = "0"
+	}
 
 	fmt.Fprintf(w, printnum)
 }

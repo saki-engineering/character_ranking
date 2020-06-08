@@ -91,25 +91,30 @@ func GetUserData(db *sql.DB, userid string) (AdminUser, error) {
 	return user, nil
 }
 
-// CheckIDExist 与えられたuseridの管理者データを探す
+// CheckIDExist 与えられたuseridが既に存在しているかを判定する
 // SQL実行、もしくはSQL結果のscanに失敗した場合、エラーを返す
-// → その場合、intは1を返す
-func CheckIDExist(db *sql.DB, userid string) (int, error) {
+// → その場合、boolはtrueを返す
+//   (存在しているのに存在していないと誤判定される方が致命的なので)
+func CheckIDExist(db *sql.DB, userid string) (bool, error) {
 	const sqlStr = `SELECT COUNT(*) FROM adminusers WHERE userid=?;`
-	cnt := 1
+	var cnt int64
 
 	rows, err := db.Query(sqlStr, userid)
 	if err != nil {
-		return cnt, err
+		return true, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		e := rows.Scan(&cnt)
 		if e != nil {
-			return cnt, e
+			return true, e
 		}
 	}
 
-	return cnt, nil
+	if cnt > 0 {
+		return true nil
+	}
+
+	return false, nil
 }
