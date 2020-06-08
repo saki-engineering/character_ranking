@@ -17,7 +17,7 @@ type Vote struct {
 
 // Result キャラクターごとの得票数をまとめた構造体
 type Result struct {
-	Chara string `json:"character"`
+	Chara string `json:"name"`
 	Vote  int    `json:"vote"`
 }
 
