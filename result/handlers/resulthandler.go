@@ -2,20 +2,11 @@ package handlers
 
 import (
 	"app/stores"
-	"database/sql"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
-
-// Vote 投票結果の構造体
-type Vote struct {
-	Chara       string         `json:"character"`
-	User        int            `json:"user"`
-	CreatedTime string         `json:"created_at"`
-	IP          sql.NullString `json:"ip"`
-}
 
 // ResultRootHandler /resultのハンドラ
 func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
@@ -25,27 +16,30 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	client := new(http.Client)
+	uStr := apiURLString("/vote/summary")
+	res, e := client.Get(uStr)
+	if e != nil {
+		log.Println("api request err: ", e)
+	}
+	defer res.Body.Close()
 
-	for i, chara := range charas {
-		uStr := apiURLString("/vote/" + chara.Name)
+	b, err2 := ioutil.ReadAll(res.Body)
+	if err2 != nil {
+		log.Println("http response read err: ", err2)
+	}
 
-		res, e := client.Get(uStr)
-		if e != nil {
-			log.Println("api request err: ", e)
+	var data []VoteResult
+	if err3 := json.Unmarshal(b, &data); err3 != nil {
+		log.Println("json parse err: ", err3)
+	}
+
+	for _, votedata := range data {
+		for i, chara := range charas {
+			if chara.Name == votedata.Name {
+				charas[i].Vote = votedata.Vote
+				break
+			}
 		}
-		defer res.Body.Close()
-
-		b, err2 := ioutil.ReadAll(res.Body)
-		if err2 != nil {
-			log.Println("http response read err: ", err2)
-		}
-
-		var data []Vote
-		if err3 := json.Unmarshal(b, &data); err3 != nil {
-			log.Println("json parse err: ", err3)
-		}
-
-		charas[i].Vote = len(data)
 	}
 
 	page := new(Page)
