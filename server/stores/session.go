@@ -37,7 +37,7 @@ func SetSessionID(w http.ResponseWriter) string {
 	}
 
 	cookie := &http.Cookie{
-		Name:    stores.SessionName,
+		Name:    SessionName,
 		Value:   uuid.String(),
 		Expires: time.Now().AddDate(1, 0, 0),
 	}
