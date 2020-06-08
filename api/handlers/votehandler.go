@@ -69,3 +69,23 @@ func CharaResultHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	w.Write([]byte(string(bytes)))
 }
+
+// VoteSammaryHandler /vote/summaryのGETハンドラ
+func VoteSammaryHandler(w http.ResponseWriter, req *http.Request) {
+	db, e := models.ConnectDB()
+	if e != nil {
+		log.Fatal("connect DB: ", e)
+	}
+	defer db.Close()
+
+	data, err := models.GetResultSummary(db)
+	if err != nil {
+		log.Println("fail GetResultSummary: ", err)
+	}
+
+	bytes, err2 := json.Marshal(data)
+	if err2 != nil {
+		log.Println("fail json Marshal: ", err2)
+	}
+	w.Write([]byte(string(bytes)))
+}

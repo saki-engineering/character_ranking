@@ -7,12 +7,18 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// Vote 投票結果の構造体
+// Vote 投じられた票の構造体
 type Vote struct {
 	Chara       string         `json:"character"`
 	User        int            `json:"user"`
 	CreatedTime string         `json:"created_at"`
 	IP          sql.NullString `json:"ip"`
+}
+
+// Result キャラクターごとの得票数をまとめた構造体
+type Result struct {
+	Chara string `json:"character"`
+	Vote  int    `json:"vote"`
 }
 
 // ConnectDB DBと接続してポインタを返す
@@ -95,7 +101,7 @@ func GetAllVoteData(db *sql.DB) ([]Vote, error) {
 	return dataArray, nil
 }
 
-// GetCharaVoteData votesテーブルの全てのデータを取得
+// GetCharaVoteData 指定キャラクターの投票データを取得
 func GetCharaVoteData(db *sql.DB, chara string) ([]Vote, error) {
 	const sqlStr = `SELECT * FROM votes WHERE chara=?;`
 
@@ -117,7 +123,29 @@ func GetCharaVoteData(db *sql.DB, chara string) ([]Vote, error) {
 	return dataArray, nil
 }
 
-// InsertUsers 指定キャラの投票データをDBに追加
+// GetResultSummary 各キャラとその得票数のデータを取得
+func GetResultSummary(db *sql.DB) ([]Result, error) {
+	const sqlStr = `SELECT chara, count(*) FROM votes group by chara;`
+
+	rows, err := db.Query(sqlStr)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	dataArray := make([]Result, 0)
+	for rows.Next() {
+		var data Result
+		err := rows.Scan(&data.Chara, &data.Vote)
+		if err != nil {
+			return nil, err
+		}
+		dataArray = append(dataArray, data)
+	}
+	return dataArray, nil
+}
+
+// InsertUsers 投票に参加したユーザーのデータをDBに追加
 func InsertUsers(db *sql.DB, age, gender, address string) (int64, error) {
 	const sqlStr = `INSERT INTO users(age, gender, address) VALUES (?, ?, ?);`
 
