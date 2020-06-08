@@ -30,7 +30,8 @@ func GetSessionID(req *http.Request) (string, error) {
 }
 
 // SetSessionID セッションIDを生成して、cookieにセットする
-func SetSessionID(w http.ResponseWriter) {
+// 返り値は生成したセッションID
+func SetSessionID(w http.ResponseWriter) string {
 	uuid, err := uuid.NewRandom()
 	if err != nil {
 		log.Println("cannot make uuid: ", err)
@@ -42,6 +43,8 @@ func SetSessionID(w http.ResponseWriter) {
 		Expires: time.Now().AddDate(1, 0, 0),
 	}
 	http.SetCookie(w, cookie)
+
+	return uuid.String()
 }
 
 // GetSessionValue セッションIDとfieldからvalueを取得
