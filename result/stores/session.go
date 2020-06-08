@@ -20,6 +20,7 @@ func ConnectRedis() (redis.Conn, error) {
 }
 
 // GetSessionID セッションIDを取得
+// もしIDを持っていなかったら、空文字列+errを返す
 func GetSessionID(req *http.Request) (string, error) {
 	cookie, err := req.Cookie(SessionName)
 	if err != nil {
@@ -43,7 +44,9 @@ func SetSessionID(w http.ResponseWriter) {
 	http.SetCookie(w, cookie)
 }
 
-// GetSessionValue セッションIDとkeyからvalueを取得
+// GetSessionValue セッションIDとfieldからvalueを取得
+// もしもそのsessionID,fieldが削除されていた場合は、errが返ってくる
+// → その場合、valueには空文字列が返ってくる
 func GetSessionValue(sessionID, field string, conn redis.Conn) (string, error) {
 	// errがnilでないならvalueは空文字列になる
 	value, err := redis.String(conn.Do("HGET", sessionID, field))
@@ -51,6 +54,7 @@ func GetSessionValue(sessionID, field string, conn redis.Conn) (string, error) {
 }
 
 // SetSessionValue セッションIDを受け取って、(field,value)の組をセット
+// セットできなかった場合は返り値にエラーが返る
 func SetSessionValue(sessionID, field, value string, conn redis.Conn) error {
 	ttl := 86400
 
@@ -60,6 +64,7 @@ func SetSessionValue(sessionID, field, value string, conn redis.Conn) error {
 }
 
 // DeleteSessionValue セッションIDを受け取って、fieldを削除
+// 削除できなかった場合は返り値にエラーが返る
 func DeleteSessionValue(sessionID, field string, conn redis.Conn) error {
 	_, err := conn.Do("HDEL", sessionID, field)
 	return err

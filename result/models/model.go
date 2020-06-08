@@ -12,10 +12,12 @@ import (
 type AdminUser struct {
 	UserID         string
 	HashedPassword string
-	Auth           int
+	// Auth 0だと一般管理者、1だと強管理者
+	Auth int
 }
 
 // ConnectDB DBと接続してポインタを返す
+// 接続時にエラーがあった場合は、それが返り値errorに入る
 func ConnectDB() (*sql.DB, error) {
 	dbDriver := "mysql"
 	dbUser := "root"
@@ -35,7 +37,7 @@ func ConnectDB() (*sql.DB, error) {
 }
 
 // CreateTable 管理者一覧テーブルがなければ作る
-// authは0だと一般管理者、1だと強管理者
+// SQL実行時にエラーがあった場合は、返り値errorに入る
 func CreateTable(db *sql.DB) error {
 	const createUserTable = `CREATE TABLE IF NOT EXISTS adminusers(
 		userid           VARCHAR(50) NOT NULL PRIMARY KEY,
@@ -50,6 +52,7 @@ func CreateTable(db *sql.DB) error {
 }
 
 // UserCreate adminuserのデータをDBに保存する
+// パスワードのハッシュ化に失敗、もしくはinsert失敗時に返り値errorが返る
 func UserCreate(db *sql.DB, userid, password string, auth int) error {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
@@ -66,6 +69,8 @@ func UserCreate(db *sql.DB, userid, password string, auth int) error {
 }
 
 // GetUserData 与えられたuseridの管理者データを探す
+// SQL実行、もしくは結果のAdminUser構造体へのパースに失敗した場合は、返り値にerrorが入る
+// → その場合、AdminUser{UserID: "", HashedPassword: "", Auth: 0}が返る(構造体初期化時の値)
 func GetUserData(db *sql.DB, userid string) (AdminUser, error) {
 	const sqlStr = `SELECT * FROM adminusers WHERE userid=?;`
 	user := AdminUser{}
@@ -87,6 +92,8 @@ func GetUserData(db *sql.DB, userid string) (AdminUser, error) {
 }
 
 // CheckIDExist 与えられたuseridの管理者データを探す
+// SQL実行、もしくはSQL結果のscanに失敗した場合、エラーを返す
+// → その場合、intは1を返す
 func CheckIDExist(db *sql.DB, userid string) (int, error) {
 	const sqlStr = `SELECT COUNT(*) FROM adminusers WHERE userid=?;`
 	cnt := 1
