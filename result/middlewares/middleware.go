@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"app/models"
 	"app/stores"
 )
 
@@ -42,19 +41,12 @@ func AuthAdmin(next http.Handler) http.Handler {
 		defer conn.Close()
 		sessionID, _ := stores.GetSessionID(req)
 
-		db, e2 := models.ConnectDB()
-		if e2 != nil {
-			log.Fatal("connect DB: ", e2)
-		}
-		defer db.Close()
-
 		userid, e3 := stores.GetSessionValue(sessionID, "userid", conn)
 		if e3 != nil {
 			log.Println("cannot get session key userid: ", e3)
 		}
 
-		user, _ := models.GetUserData(db, userid)
-		if user.UserID != "" {
+		if userid != "" {
 			next.ServeHTTP(w, req)
 		} else {
 			http.Error(w, "Forbidden", http.StatusForbidden)
@@ -71,12 +63,6 @@ func AuthSuperAdmin(next http.Handler) http.Handler {
 		}
 		defer conn.Close()
 		sessionID, _ := stores.GetSessionID(req)
-
-		db, e := models.ConnectDB()
-		if e != nil {
-			log.Fatal("connect DB: ", e)
-		}
-		defer db.Close()
 
 		auth, err2 := stores.GetSessionValue(sessionID, "auth", conn)
 		if err2 != nil {
