@@ -112,7 +112,7 @@ func CheckIDExist(db *sql.DB, userid string) (bool, error) {
 	}
 
 	if cnt > 0 {
-		return true nil
+		return true, nil
 	}
 
 	return false, nil
