@@ -31,9 +31,9 @@ func ConnectDB() (*sql.DB, error) {
 		dbAddress = os.Getenv("DB_ADDRESS")
 	}
 
-	//db, e := sql.Open("mysql", "root:pass@tcp(mysql:3306)/sampledb")
-	db, e := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp("+dbAddress+":3306)/"+dbName)
-	return db, e
+	//db, err := sql.Open("mysql", "root:pass@tcp(mysql:3306)/sampledb")
+	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp("+dbAddress+":3306)/"+dbName)
+	return db, err
 }
 
 // CreateTable 管理者一覧テーブルがなければ作る
@@ -60,9 +60,8 @@ func UserCreate(db *sql.DB, userid, password string, auth int) error {
 	}
 
 	const sqlStr = `INSERT INTO adminusers(userid, hashedpassword, auth) VALUES (?, ?, ?);`
-	_, err2 := db.Exec(sqlStr, userid, hash, auth)
-	if err2 != nil {
-		return err2
+	if _, err := db.Exec(sqlStr, userid, hash, auth); err != nil {
+		return err
 	}
 
 	return nil
@@ -82,9 +81,9 @@ func GetUserData(db *sql.DB, userid string) (AdminUser, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		e := rows.Scan(&user.UserID, &user.HashedPassword, &user.Auth)
-		if e != nil {
-			return user, e
+		err := rows.Scan(&user.UserID, &user.HashedPassword, &user.Auth)
+		if err != nil {
+			return user, err
 		}
 	}
 
@@ -106,9 +105,9 @@ func CheckIDExist(db *sql.DB, userid string) (bool, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		e := rows.Scan(&cnt)
-		if e != nil {
-			return true, e
+		err := rows.Scan(&cnt)
+		if err != nil {
+			return true, err
 		}
 	}
 
