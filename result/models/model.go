@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"os"
 
+	"app/apperrors"
+
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -33,7 +35,11 @@ func ConnectDB() (*sql.DB, error) {
 
 	//db, err := sql.Open("mysql", "root:pass@tcp(mysql:3306)/sampledb")
 	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp("+dbAddress+":3306)/"+dbName)
-	return db, err
+	if err != nil {
+		err = apperrors.DBConnectionFailed.Wrap(err, "Cannot connect to DB")
+		return nil, err
+	}
+	return db, nil
 }
 
 // CreateTable 管理者一覧テーブルがなければ作る
@@ -46,6 +52,7 @@ func CreateTable(db *sql.DB) error {
 	);`
 	_, err := db.Exec(createUserTable)
 	if err != nil {
+		err = apperrors.MySQLSetUpError.Wrap(err, "failed to set up DB")
 		return err
 	}
 	return nil
@@ -56,11 +63,13 @@ func CreateTable(db *sql.DB) error {
 func UserCreate(db *sql.DB, userid, password string, auth int) error {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
+		err = apperrors.MySQLDataCreateFailed.Wrap(err, "fail to save data")
 		return err
 	}
 
 	const sqlStr = `INSERT INTO adminusers(userid, hashedpassword, auth) VALUES (?, ?, ?);`
 	if _, err := db.Exec(sqlStr, userid, hash, auth); err != nil {
+		err = apperrors.MySQLExecError.Wrap(err, "fail to save data")
 		return err
 	}
 
@@ -76,6 +85,7 @@ func GetUserData(db *sql.DB, userid string) (AdminUser, error) {
 
 	rows, err := db.Query(sqlStr, userid)
 	if err != nil {
+		err = apperrors.MySQLQueryError.Wrap(err, "cannot get data from DB")
 		return user, err
 	}
 	defer rows.Close()
@@ -83,6 +93,7 @@ func GetUserData(db *sql.DB, userid string) (AdminUser, error) {
 	for rows.Next() {
 		err := rows.Scan(&user.UserID, &user.HashedPassword, &user.Auth)
 		if err != nil {
+			err = apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
 			return user, err
 		}
 	}
@@ -100,6 +111,7 @@ func CheckIDExist(db *sql.DB, userid string) (bool, error) {
 
 	rows, err := db.Query(sqlStr, userid)
 	if err != nil {
+		err = apperrors.MySQLQueryError.Wrap(err, "cannot get data from DB")
 		return true, err
 	}
 	defer rows.Close()
@@ -107,6 +119,7 @@ func CheckIDExist(db *sql.DB, userid string) (bool, error) {
 	for rows.Next() {
 		err := rows.Scan(&cnt)
 		if err != nil {
+			err = apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
 			return true, err
 		}
 	}
