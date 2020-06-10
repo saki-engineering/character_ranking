@@ -29,6 +29,11 @@ const (
 	SessionIDCreatedFailed ErrorType = 32
 	// SessionInfoEditFailed redisコマンド実行時のエラーコード
 	SessionInfoEditFailed ErrorType = 33
+
+	// HTMLTemplateLoadFailed テンプレートの読み込みに失敗したときのエラーコード
+	HTMLTemplateLoadFailed ErrorType = 40
+	// HTMLTemplateExecFailed テンプレートにPage構造体を渡すのに失敗したときのエラーコード
+	HTMLTemplateExecFailed ErrorType = 41
 )
 
 // Wrap 発生したerrに、エラーコードとカスタムメッセージを与えて、AppError型にするメソッド

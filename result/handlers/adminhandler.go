@@ -16,7 +16,8 @@ func AdminRootHandler(w http.ResponseWriter, req *http.Request) {
 
 	page := new(Page)
 	page.Title = "View Result!"
-	err = tmpl.Execute(w, page)
+
+	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		log.Fatal("Execute on RootHandler: ", err)
 	}
@@ -31,7 +32,7 @@ func CreateUserFormHandler(w http.ResponseWriter, req *http.Request) {
 
 	page := new(Page)
 	page.Title = "View Result!"
-	err = tmpl.Execute(w, page)
+	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		log.Fatal("Execute on RootHandler: ", err)
 	}
@@ -90,7 +91,7 @@ func CheckUserHandler(w http.ResponseWriter, req *http.Request) {
 	page.NewUser.UserID, _ = stores.GetSessionValue(sessionID, "newuserid", conn)
 	page.NewUser.Password, _ = stores.GetSessionValue(sessionID, "newpassword", conn)
 
-	err = tmpl.Execute(w, page)
+	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		log.Fatal("Execute on RootHandler: ", err)
 	}

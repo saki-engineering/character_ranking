@@ -58,7 +58,7 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 		page.LogIn = true
 	}
 
-	err = tmpl.Execute(w, page)
+	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		log.Fatal("Execute on ResultRootHandler: ", err)
 	}

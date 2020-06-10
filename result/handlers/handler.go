@@ -39,7 +39,7 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 		page.Admin = true
 	}
 
-	err = tmpl.Execute(w, page)
+	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		log.Fatal("Execute on RootHandler: ", err)
 	}
@@ -54,7 +54,7 @@ func LoginPageHandler(w http.ResponseWriter, req *http.Request) {
 
 	page := new(Page)
 	page.Title = "View Result!"
-	err = tmpl.Execute(w, page)
+	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		log.Fatal("Execute on RootHandler: ", err)
 	}
