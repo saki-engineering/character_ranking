@@ -90,7 +90,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	defer conn.Close()
 	oldSessionID, _ := stores.GetSessionID(req)
 
-	newSessionID := stores.SetSessionID(w)
+	newSessionID, _ := stores.SetSessionID(w)
 	stores.ReNameSessionID(oldSessionID, newSessionID, conn)
 
 	stores.SetSessionValue(newSessionID, "userid", user.UserID, conn)
