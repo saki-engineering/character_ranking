@@ -15,3 +15,19 @@ func GetType(err error) ErrorType {
 	}
 	return Unknown
 }
+
+// AppError型のMessageを返すインターフェース
+type messageGetter interface {
+	Log() string
+}
+
+// GetMessage AppError型でエラーメッセージをもつ場合はそれを返し、なければ空文字列を返す
+func GetMessage(err error) string {
+	for {
+		if e, ok := err.(messageGetter); ok {
+			return e.Log()
+		}
+		break
+	}
+	return ""
+}

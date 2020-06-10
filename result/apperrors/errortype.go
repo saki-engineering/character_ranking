@@ -13,6 +13,6 @@ const (
 )
 
 // Wrap 発生したerrに、エラーコードとカスタムメッセージを与えて、AppError型にするメソッド
-func (typecode ErrorType) Wrap(err error) error {
-	return AppError{Code: typecode, error: err}
+func (typecode ErrorType) Wrap(err error, message string) error {
+	return AppError{Code: typecode, error: err, Message: message}
 }
