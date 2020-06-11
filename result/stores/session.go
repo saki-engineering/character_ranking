@@ -1,7 +1,6 @@
 package stores
 
 import (
-	"log"
 	"net/http"
 	"time"
 
@@ -40,7 +39,7 @@ func GetSessionID(req *http.Request) (string, error) {
 // SetSessionID セッションIDを生成して、cookieにセットする
 // 返り値は生成したセッションIDとエラー
 // 生成に失敗した時は、空文字列とエラーが返ってくる
-func SetSessionID(w http.ResponseWriter) string, error {
+func SetSessionID(w http.ResponseWriter) (string, error) {
 	uuid, err := uuid.NewRandom()
 	if err != nil {
 		err = apperrors.SessionIDCreatedFailed.Wrap(err, "cannot use session")

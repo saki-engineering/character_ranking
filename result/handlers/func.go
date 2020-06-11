@@ -22,7 +22,7 @@ func loadTemplate(name string) (*template.Template, error) {
 	return tmpl, err
 }
 
-func executeTemplate(w http.ResponseWriter, tmpl *template.Template, page Page) error {
+func executeTemplate(w http.ResponseWriter, tmpl *template.Template, page *Page) error {
 	err := tmpl.Execute(w, page)
 
 	if err != nil {
