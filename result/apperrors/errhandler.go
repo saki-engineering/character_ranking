@@ -1,5 +1,7 @@
 package apperrors
 
+import "log"
+
 // ErrorTypeを返すインターフェース
 type typeGetter interface {
 	Type() ErrorType
@@ -30,4 +32,9 @@ func GetMessage(err error) string {
 		break
 	}
 	return ""
+}
+
+// ErrorHandler エラーが発生したときのロギング・アプリの終了判定をここで一括で行う
+func ErrorHandler(err error) {
+	log.Println(err, GetType(err), GetMessage(err))
 }
