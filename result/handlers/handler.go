@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"app/apperrors"
 	"app/models"
 	"app/stores"
 
@@ -15,7 +16,7 @@ import (
 func RootHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("index")
 	if err != nil {
-		log.Fatal("ParseFiles: ", err)
+		apperrors.ErrorHandler(err)
 	}
 
 	page := new(Page)
@@ -25,7 +26,7 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 	page.Admin = false
 	conn, e := stores.ConnectRedis()
 	if e != nil {
-		log.Fatal("cannot connect redis: ", e)
+		apperrors.ErrorHandler(e)
 	}
 	defer conn.Close()
 	sessionID, _ := stores.GetSessionID(req)
@@ -41,7 +42,7 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		log.Fatal("Execute on RootHandler: ", err)
+		apperrors.ErrorHandler(err)
 	}
 }
 
@@ -49,14 +50,14 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 func LoginPageHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("login")
 	if err != nil {
-		log.Fatal("ParseFiles: ", err)
+		apperrors.ErrorHandler(err)
 	}
 
 	page := new(Page)
 	page.Title = "View Result!"
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		log.Fatal("Execute on RootHandler: ", err)
+		apperrors.ErrorHandler(err)
 	}
 }
 
@@ -65,13 +66,12 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	db, e := models.ConnectDB()
 	if e != nil {
-		log.Fatal("connect DB: ", e)
+		apperrors.ErrorHandler(e)
 	}
 	defer db.Close()
 
 	user, err := models.GetUserData(db, req.Form.Get("userid"))
 	if err != nil {
-		log.Println("cannot get adminuser data: ", err)
 		http.Redirect(w, req, "/login", http.StatusSeeOther)
 		return
 	}
@@ -79,14 +79,13 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	err2 := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(req.Form.Get("password")))
 	// パスワードが正しくなかった場合はerrが返る
 	if err2 != nil {
-		log.Println("password is not correct: ", err2)
 		http.Redirect(w, req, "/login", http.StatusSeeOther)
 		return
 	}
 
 	conn, err3 := stores.ConnectRedis()
 	if err3 != nil {
-		log.Fatal("cannot connect redis: ", err3)
+		apperrors.ErrorHandler(err3)
 	}
 	defer conn.Close()
 	oldSessionID, _ := stores.GetSessionID(req)
@@ -110,7 +109,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 func LogoutHandler(w http.ResponseWriter, req *http.Request) {
 	conn, err := stores.ConnectRedis()
 	if err != nil {
-		log.Fatal("cannot connect redis: ", err)
+		apperrors.ErrorHandler(err)
 	}
 	defer conn.Close()
 	sessionID, _ := stores.GetSessionID(req)
@@ -127,13 +126,13 @@ func CheckIDHandler(w http.ResponseWriter, req *http.Request) {
 
 	db, e := models.ConnectDB()
 	if e != nil {
-		log.Fatal("connect DB: ", e)
+		apperrors.ErrorHandler(e)
 	}
 	defer db.Close()
 
 	exist, err := models.CheckIDExist(db, req.Form.Get("userid"))
 	if err != nil {
-		log.Println("checkIDExxist: ", err)
+		apperrors.ErrorHandler(err)
 	}
 
 	var printnum string

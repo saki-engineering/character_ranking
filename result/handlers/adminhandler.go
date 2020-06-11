@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"app/apperrors"
 	"app/models"
 	"app/stores"
+
 	"log"
 	"net/http"
 )
@@ -11,7 +13,7 @@ import (
 func AdminRootHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("admin/index")
 	if err != nil {
-		log.Fatal("ParseFiles: ", err)
+		apperrors.ErrorHandler(err)
 	}
 
 	page := new(Page)
@@ -19,7 +21,7 @@ func AdminRootHandler(w http.ResponseWriter, req *http.Request) {
 
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		log.Fatal("Execute on RootHandler: ", err)
+		apperrors.ErrorHandler(err)
 	}
 }
 
@@ -27,14 +29,14 @@ func AdminRootHandler(w http.ResponseWriter, req *http.Request) {
 func CreateUserFormHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("admin/form")
 	if err != nil {
-		log.Fatal("ParseFiles: ", err)
+		apperrors.ErrorHandler(err)
 	}
 
 	page := new(Page)
 	page.Title = "View Result!"
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		log.Fatal("Execute on RootHandler: ", err)
+		apperrors.ErrorHandler(err)
 	}
 }
 
@@ -44,7 +46,7 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 
 	conn, err2 := stores.ConnectRedis()
 	if err2 != nil {
-		log.Fatal("cannot connect redis: ", err2)
+		apperrors.ErrorHandler(err2)
 	}
 	defer conn.Close()
 	sessionID, _ := stores.GetSessionID(req)
@@ -54,6 +56,7 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 
 	db, e := models.ConnectDB()
 	if e != nil {
+		apperrors.ErrorHandler(e)
 		log.Fatal("connect DB: ", e)
 	}
 	defer db.Close()
@@ -65,7 +68,7 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 
 	err := models.UserCreate(db, req.Form.Get("userid"), req.Form.Get("password"), auth)
 	if err != nil {
-		log.Println("create admin user: ", err)
+		apperrors.ErrorHandler(err)
 	} else {
 		log.Println("success to create admin user")
 	}
@@ -76,12 +79,12 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 func CheckUserHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("admin/newuser")
 	if err != nil {
-		log.Fatal("ParseFiles: ", err)
+		apperrors.ErrorHandler(err)
 	}
 
 	conn, err2 := stores.ConnectRedis()
 	if err2 != nil {
-		log.Fatal("cannot connect redis: ", err2)
+		apperrors.ErrorHandler(err2)
 	}
 	defer conn.Close()
 	sessionID, _ := stores.GetSessionID(req)
@@ -93,7 +96,7 @@ func CheckUserHandler(w http.ResponseWriter, req *http.Request) {
 
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		log.Fatal("Execute on RootHandler: ", err)
+		apperrors.ErrorHandler(err)
 	}
 
 	stores.DeleteSessionValue(sessionID, "newuserid", conn)

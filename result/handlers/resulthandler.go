@@ -6,7 +6,6 @@ import (
 
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -14,7 +13,7 @@ import (
 func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("result/index")
 	if err != nil {
-		log.Fatal("ParseFiles: ", err)
+		apperrors.ErrorHandler(err)
 	}
 
 	client := new(http.Client)
@@ -22,20 +21,20 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 	res, e := client.Get(uStr)
 	if e != nil {
 		e = apperrors.VoteAPIRequestError.Wrap(e, "cannot get vote data")
-		log.Println("api request err: ", e)
+		apperrors.ErrorHandler(e)
 	}
 	defer res.Body.Close()
 
 	b, err2 := ioutil.ReadAll(res.Body)
 	if err2 != nil {
 		err2 = apperrors.VoteAPIResponseReadFailed.Wrap(err2, "cannot get vote data")
-		log.Println("http response read err: ", err2)
+		apperrors.ErrorHandler(err2)
 	}
 
 	var data []VoteResult
 	if err3 := json.Unmarshal(b, &data); err3 != nil {
 		err3 = apperrors.VoteAPIResponseReadFailed.Wrap(err3, "cannot get vote data")
-		log.Println("json parse err: ", err3)
+		apperrors.ErrorHandler(err3)
 	}
 
 	for _, votedata := range data {
@@ -53,7 +52,7 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 
 	conn, e := stores.ConnectRedis()
 	if e != nil {
-		log.Fatal("cannot connect redis: ", e)
+		apperrors.ErrorHandler(e)
 	}
 	defer conn.Close()
 	sessionID, _ := stores.GetSessionID(req)
@@ -65,6 +64,6 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		log.Fatal("Execute on ResultRootHandler: ", err)
+		apperrors.ErrorHandler(err)
 	}
 }
