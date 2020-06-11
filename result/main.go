@@ -21,24 +21,24 @@ func main() {
 
 	db, e := models.ConnectDB()
 	if e != nil {
-		log.Fatal("connect DB: ", e)
+		log.Fatal(apperrors.GetType(e), "||", apperrors.GetMessage(e), "||", e)
 	}
 
 	if err := models.CreateTable(db); err != nil {
-		log.Printf("%T\n", err)
 		apperrors.ErrorHandler(err)
+		log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
 	} else {
 		log.Println("success to create adminuser table")
 	}
 
 	user, err2 := models.GetUserData(db, "admin")
 	if err2 != nil {
-		log.Println("fail to search user 'admin'")
+		log.Fatal(apperrors.GetType(err2), "||", apperrors.GetMessage(err2), "||", err2)
 	}
 	if user.UserID != "admin" {
 		err3 := models.UserCreate(db, "admin", "admin", 1)
 		if err3 != nil {
-			log.Println("fail to create super admin user: ", err3)
+			log.Fatal(apperrors.GetType(err3), "||", apperrors.GetMessage(err3), "||", err3)
 		} else {
 			log.Println("success to create super admin user")
 		}
@@ -49,6 +49,6 @@ func main() {
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
 		err = apperrors.HTTPServerPortListenFailed.Wrap(err, "server cannot listen port")
-		log.Fatal("ListenAndServe: ", err)
+		log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
 	}
 }
