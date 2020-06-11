@@ -77,6 +77,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	err2 := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(req.Form.Get("password")))
+	// パスワードが正しくなかった場合はerrが返る
 	if err2 != nil {
 		log.Println("password is not correct: ", err2)
 		http.Redirect(w, req, "/login", http.StatusSeeOther)

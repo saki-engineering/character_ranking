@@ -34,6 +34,11 @@ const (
 	HTMLTemplateLoadFailed ErrorType = 40
 	// HTMLTemplateExecFailed テンプレートにPage構造体を渡すのに失敗したときのエラーコード
 	HTMLTemplateExecFailed ErrorType = 41
+
+	// VoteAPIRequestError vote_apiのリクエストに失敗したときのエラーコード
+	VoteAPIRequestError ErrorType = 50
+	// VoteAPIResponseReadFailed vote_apiからのレスポンスボディの読み込み失敗orjsonパース失敗時のエラーコード
+	VoteAPIResponseReadFailed ErrorType = 51
 )
 
 // Wrap 発生したerrに、エラーコードとカスタムメッセージを与えて、AppError型にするメソッド
