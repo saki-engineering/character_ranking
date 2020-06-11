@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"app/apperrors"
 	"app/models"
 	"app/routers"
 )
@@ -24,7 +25,8 @@ func main() {
 	}
 
 	if err := models.CreateTable(db); err != nil {
-		log.Println("create table: ", err)
+		log.Printf("%T\n", err)
+		apperrors.ErrorHandler(err)
 	} else {
 		log.Println("success to create adminuser table")
 	}
@@ -46,6 +48,7 @@ func main() {
 
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
+		err = apperrors.HTTPServerPortListenFailed.Wrap(err, "server cannot listen port")
 		log.Fatal("ListenAndServe: ", err)
 	}
 }

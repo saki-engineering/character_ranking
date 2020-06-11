@@ -39,6 +39,9 @@ const (
 	VoteAPIRequestError ErrorType = 50
 	// VoteAPIResponseReadFailed vote_apiからのレスポンスボディの読み込み失敗orjsonパース失敗時のエラーコード
 	VoteAPIResponseReadFailed ErrorType = 51
+
+	// HTTPServerPortListenFailed httpサーバーの軌道に失敗したときのエラーコード
+	HTTPServerPortListenFailed ErrorType = 60
 )
 
 // Wrap 発生したerrに、エラーコードとカスタムメッセージを与えて、AppError型にするメソッド
