@@ -36,5 +36,5 @@ func GetMessage(err error) string {
 
 // ErrorHandler エラーが発生したときのロギング・アプリの終了判定をここで一括で行う
 func ErrorHandler(err error) {
-	log.Println(err, GetType(err), GetMessage(err))
+	log.Println(GetType(err), "||", GetMessage(err), "||", err)
 }
