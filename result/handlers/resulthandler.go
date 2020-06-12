@@ -20,28 +20,28 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 
 	client := new(http.Client)
 	uStr := apiURLString("/vote/summary")
-	res, e := client.Get(uStr)
-	if e != nil {
-		e = apperrors.VoteAPIRequestError.Wrap(e, "cannot get vote data")
-		apperrors.ErrorHandler(e)
-		http.Error(w, apperrors.GetMessage(e), http.StatusInternalServerError)
+	res, err := client.Get(uStr)
+	if err != nil {
+		err = apperrors.VoteAPIRequestError.Wrap(err, "cannot get vote data")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 	defer res.Body.Close()
 
-	b, err2 := ioutil.ReadAll(res.Body)
-	if err2 != nil {
-		err2 = apperrors.VoteAPIResponseReadFailed.Wrap(err2, "cannot get vote data")
-		apperrors.ErrorHandler(err2)
-		http.Error(w, apperrors.GetMessage(err2), http.StatusInternalServerError)
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 
 	var data []VoteResult
-	if err3 := json.Unmarshal(b, &data); err3 != nil {
-		err3 = apperrors.VoteAPIResponseReadFailed.Wrap(err3, "cannot get vote data")
-		apperrors.ErrorHandler(err3)
-		http.Error(w, apperrors.GetMessage(err3), http.StatusInternalServerError)
+	if err = json.Unmarshal(b, &data); err != nil {
+		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 
@@ -58,10 +58,10 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 	page.Title = "VIew Result!"
 	page.Character = charas
 
-	conn, e := stores.ConnectRedis()
-	if e != nil {
-		apperrors.ErrorHandler(e)
-		http.Error(w, apperrors.GetMessage(e), http.StatusInternalServerError)
+	conn, err := stores.ConnectRedis()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 	defer conn.Close()

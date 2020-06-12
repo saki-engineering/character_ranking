@@ -52,10 +52,10 @@ func CreateUserFormHandler(w http.ResponseWriter, req *http.Request) {
 func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
-	conn, err2 := stores.ConnectRedis()
-	if err2 != nil {
-		apperrors.ErrorHandler(err2)
-		http.Error(w, apperrors.GetMessage(err2), http.StatusInternalServerError)
+	conn, err := stores.ConnectRedis()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 	defer conn.Close()
@@ -64,10 +64,10 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 	stores.SetSessionValue(sessionID, "newuserid", req.Form.Get("userid"), conn)
 	stores.SetSessionValue(sessionID, "newpassword", req.Form.Get("password"), conn)
 
-	db, e := models.ConnectDB()
-	if e != nil {
-		apperrors.ErrorHandler(e)
-		http.Error(w, apperrors.GetMessage(e), http.StatusInternalServerError)
+	db, err := models.ConnectDB()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 	defer db.Close()
@@ -77,14 +77,13 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 		auth = 1
 	}
 
-	err := models.UserCreate(db, req.Form.Get("userid"), req.Form.Get("password"), auth)
+	err = models.UserCreate(db, req.Form.Get("userid"), req.Form.Get("password"), auth)
 	if err != nil {
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
-	} else {
-		log.Println("success to create admin user")
 	}
+	log.Println("success to create admin user")
 	http.Redirect(w, req, "/admin/newuser", http.StatusSeeOther)
 }
 
@@ -97,10 +96,10 @@ func CheckUserHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	conn, err2 := stores.ConnectRedis()
-	if err2 != nil {
-		apperrors.ErrorHandler(err2)
-		http.Error(w, apperrors.GetMessage(err2), http.StatusInternalServerError)
+	conn, err := stores.ConnectRedis()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 	defer conn.Close()

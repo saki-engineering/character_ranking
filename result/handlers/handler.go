@@ -26,10 +26,10 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 	page.UserID = ""
 	page.LogIn = false
 	page.Admin = false
-	conn, e := stores.ConnectRedis()
-	if e != nil {
-		apperrors.ErrorHandler(e)
-		http.Error(w, apperrors.GetMessage(e), http.StatusInternalServerError)
+	conn, err := stores.ConnectRedis()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 	defer conn.Close()
@@ -74,10 +74,10 @@ func LoginPageHandler(w http.ResponseWriter, req *http.Request) {
 // LoginHandler /loginのPOSTハンドラ
 func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
-	db, e := models.ConnectDB()
-	if e != nil {
-		apperrors.ErrorHandler(e)
-		http.Error(w, apperrors.GetMessage(e), http.StatusInternalServerError)
+	db, err := models.ConnectDB()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 	defer db.Close()
@@ -88,17 +88,17 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err2 := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(req.Form.Get("password")))
+	err = bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(req.Form.Get("password")))
 	// パスワードが正しくなかった場合はerrが返る
-	if err2 != nil {
+	if err != nil {
 		http.Redirect(w, req, "/login", http.StatusSeeOther)
 		return
 	}
 
-	conn, err3 := stores.ConnectRedis()
-	if err3 != nil {
-		apperrors.ErrorHandler(err3)
-		http.Error(w, apperrors.GetMessage(err3), http.StatusInternalServerError)
+	conn, err := stores.ConnectRedis()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 	defer conn.Close()
@@ -140,10 +140,10 @@ func LogoutHandler(w http.ResponseWriter, req *http.Request) {
 func CheckIDHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
-	db, e := models.ConnectDB()
-	if e != nil {
-		apperrors.ErrorHandler(e)
-		http.Error(w, apperrors.GetMessage(e), http.StatusInternalServerError)
+	db, err := models.ConnectDB()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 	defer db.Close()
