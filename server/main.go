@@ -15,9 +15,6 @@ func main() {
 
 	r := routers.CreateRouter()
 
-	fs := http.FileServer(http.Dir("./resources"))
-	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
-
 	conn, e := stores.ConnectRedis()
 	if e != nil {
 		log.Fatal("cannot connect redis: ", e)
