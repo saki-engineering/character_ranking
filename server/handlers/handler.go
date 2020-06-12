@@ -1,7 +1,8 @@
 package handlers
 
 import (
-	"log"
+	"app/apperrors"
+
 	"net/http"
 )
 
@@ -9,14 +10,18 @@ import (
 func ViewTopHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("index")
 	if err != nil {
-		log.Fatal("ParseFiles: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 
 	page := new(Page)
 	page.Title = "Character rankinig!"
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		log.Fatal("Execute on viewHandler: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -24,14 +29,18 @@ func ViewTopHandler(w http.ResponseWriter, req *http.Request) {
 func ViewAboutHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("about")
 	if err != nil {
-		log.Fatal("ParseFiles: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 
 	page := new(Page)
 	page.Title = "Character rankinig!"
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		log.Fatal("Execute on viewHandler: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -39,13 +48,17 @@ func ViewAboutHandler(w http.ResponseWriter, req *http.Request) {
 func ViewFaqHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("faq")
 	if err != nil {
-		log.Fatal("ParseFiles: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 
 	page := new(Page)
 	page.Title = "Character rankinig!"
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		log.Fatal("Execute on viewHandler: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 }

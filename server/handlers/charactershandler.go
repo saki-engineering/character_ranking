@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
 
+	"app/apperrors"
 	"app/stores"
 
 	"github.com/gorilla/mux"
@@ -15,7 +15,9 @@ import (
 func CharacterHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("characters/index")
 	if err != nil {
-		log.Fatal("ParseFiles: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 
 	page := new(Page)
@@ -23,7 +25,9 @@ func CharacterHandler(w http.ResponseWriter, req *http.Request) {
 	page.Character = charas
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		log.Fatal("Execute on viewHandler: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -31,7 +35,9 @@ func CharacterHandler(w http.ResponseWriter, req *http.Request) {
 func CharacterDetailHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("characters/detail")
 	if err != nil {
-		log.Fatal("ParseFiles: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 
 	vars := mux.Vars(req)
@@ -40,16 +46,20 @@ func CharacterDetailHandler(w http.ResponseWriter, req *http.Request) {
 	page.Description = desp[vars["name"]]
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		log.Fatal("Execute on viewHandler: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 }
 
 // CharacterVoteHandler 投票ボタンが押された時に、フォームに行くかVoted画面に行くかを判定する
 func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
-	conn, e := stores.ConnectRedis()
-	if e != nil {
-		log.Fatal("cannot connect redis: ", e)
+	conn, err := stores.ConnectRedis()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 	defer conn.Close()
 	sessionID, _ := stores.GetSessionID(req)
@@ -70,9 +80,11 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 	values.Add("character", req.Form.Get("character"))
 	values.Add("user", user)
 
-	_, err1 := client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
-	if err1 != nil {
-		log.Println("client post err: ", err1)
+	_, err = client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
+	if err != nil {
+		apperrors.VoteAPIRequestError.Wrap(err, "fail to vote")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 
@@ -84,13 +96,17 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 func CharacterVotedHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("characters/voted")
 	if err != nil {
-		log.Fatal("ParseFiles: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 
 	page := new(Page)
 	page.Title = "Completed!"
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		log.Fatal("Execute on viewHandler: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 }
