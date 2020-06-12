@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"app/apperrors"
 	"app/models"
 	"encoding/json"
 	"log"
@@ -11,20 +12,27 @@ import (
 
 // VoteResultHandler /vote/のGETハンドラ
 func VoteResultHandler(w http.ResponseWriter, req *http.Request) {
-	db, e := models.ConnectDB()
-	if e != nil {
-		log.Fatal("connect DB: ", e)
+	db, err := models.ConnectDB()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 	defer db.Close()
 
 	data, err := models.GetAllVoteData(db)
 	if err != nil {
-		log.Println("fail GetAllVoteData: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 
-	bytes, err2 := json.Marshal(data)
-	if err2 != nil {
-		log.Println("fail json Marshal: ", err2)
+	bytes, err := json.Marshal(data)
+	if err != nil {
+		apperrors.JSONFormatFailed.Wrap(err, "fail to create json data")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 	w.Write([]byte(string(bytes)))
 }
@@ -34,37 +42,44 @@ func VoteResultHandler(w http.ResponseWriter, req *http.Request) {
 func VoteCharaHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
-	db, e := models.ConnectDB()
-	if e != nil {
-		log.Fatal("connect DB: ", e)
+	db, err := models.ConnectDB()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 	defer db.Close()
 
-	err := models.InsertVotes(db, req.Form.Get("character"), req.Form.Get("user"))
+	err = models.InsertVotes(db, req.Form.Get("character"), req.Form.Get("user"))
 	if err != nil {
-		log.Println("insert: ", err)
-	} else {
-		log.Println("vote insert success")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
+	log.Println("vote insert success")
 }
 
 // CharaResultHandler /vote/{name}のGETハンドラ
 func CharaResultHandler(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 
-	db, e := models.ConnectDB()
-	if e != nil {
-		log.Fatal("connect DB: ", e)
+	db, err := models.ConnectDB()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 	defer db.Close()
 
 	data, err := models.GetCharaVoteData(db, vars["name"])
 	if err != nil {
-		log.Println("fail GetCharaVoteData: ", err)
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 
-	bytes, err2 := json.Marshal(data)
-	if err2 != nil {
+	bytes, err := json.Marshal(data)
+	if err != nil {
 		log.Println("fail json Marshal: ", err2)
 	}
 	w.Write([]byte(string(bytes)))
@@ -85,7 +100,10 @@ func VoteSammaryHandler(w http.ResponseWriter, req *http.Request) {
 
 	bytes, err2 := json.Marshal(data)
 	if err2 != nil {
-		log.Println("fail json Marshal: ", err2)
+		apperrors.JSONFormatFailed.Wrap(err, "fail to create json data")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 	w.Write([]byte(string(bytes)))
 }

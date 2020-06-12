@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"os"
 
+	"app/apperrors"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -36,8 +38,12 @@ func ConnectDB() (*sql.DB, error) {
 	}
 
 	//db, e := sql.Open("mysql", "root:pass@tcp(mysql:3306)/sampledb")
-	db, e := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp("+dbAddress+":3306)/"+dbName)
-	return db, e
+	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp("+dbAddress+":3306)/"+dbName)
+	if err != nil {
+		apperrors.DBConnectionFailed.Wrap(err, "cannot connect to DB")
+		return nil, err
+	}
+	return db, nil
 }
 
 // CreateTable 投票結果を入れるテーブルがなければ作る
@@ -50,6 +56,7 @@ func CreateTable(db *sql.DB) error {
 	);`
 	_, err := db.Exec(createUserTable)
 	if err != nil {
+		apperrors.MySQLSetUpError.Wrap(err, "fail to set up DB")
 		return err
 	}
 
@@ -61,9 +68,10 @@ func CreateTable(db *sql.DB) error {
 		FOREIGN KEY (user) REFERENCES users (id)
 	);`
 
-	_, err2 := db.Exec(createVoteTable)
-	if err2 != nil {
-		return err2
+	_, err = db.Exec(createVoteTable)
+	if err != nil {
+		apperrors.MySQLSetUpError.Wrap(err, "fail to set up DB")
+		return err
 	}
 	return nil
 }
@@ -74,6 +82,7 @@ func InsertVotes(db *sql.DB, chara, user string) error {
 
 	_, err := db.Exec(sqlStr, chara, user)
 	if err != nil {
+		apperrors.MySQLExecError.Wrap(err, "fail to save data")
 		return err
 	}
 	return nil
@@ -85,6 +94,7 @@ func GetAllVoteData(db *sql.DB) ([]Vote, error) {
 
 	rows, err := db.Query(sqlStr)
 	if err != nil {
+		apperrors.MySQLQueryError.Wrap(err, "cannot get data")
 		return nil, err
 	}
 	defer rows.Close()
@@ -94,6 +104,7 @@ func GetAllVoteData(db *sql.DB) ([]Vote, error) {
 		var data Vote
 		err := rows.Scan(&data.Chara, &data.User, &data.CreatedTime, &data.IP)
 		if err != nil {
+			apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
 			return nil, err
 		}
 		dataArray = append(dataArray, data)
@@ -107,6 +118,7 @@ func GetCharaVoteData(db *sql.DB, chara string) ([]Vote, error) {
 
 	rows, err := db.Query(sqlStr, chara)
 	if err != nil {
+		apperrors.MySQLQueryError.Wrap(err, "cannot get data")
 		return nil, err
 	}
 	defer rows.Close()
@@ -116,6 +128,7 @@ func GetCharaVoteData(db *sql.DB, chara string) ([]Vote, error) {
 		var data Vote
 		err := rows.Scan(&data.Chara, &data.User, &data.CreatedTime, &data.IP)
 		if err != nil {
+			apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
 			return nil, err
 		}
 		dataArray = append(dataArray, data)
@@ -129,6 +142,7 @@ func GetResultSummary(db *sql.DB) ([]Result, error) {
 
 	rows, err := db.Query(sqlStr)
 	if err != nil {
+		apperrors.MySQLQueryError.Wrap(err, "cannot get data")
 		return nil, err
 	}
 	defer rows.Close()
@@ -138,6 +152,7 @@ func GetResultSummary(db *sql.DB) ([]Result, error) {
 		var data Result
 		err := rows.Scan(&data.Chara, &data.Vote)
 		if err != nil {
+			apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
 			return nil, err
 		}
 		dataArray = append(dataArray, data)
@@ -151,12 +166,14 @@ func InsertUsers(db *sql.DB, age, gender, address string) (int64, error) {
 
 	result, err := db.Exec(sqlStr, age, gender, address)
 	if err != nil {
+		apperrors.MySQLExecError.Wrap(err, "fail to save data")
 		return 0, err
 	}
 
-	id, err2 := result.LastInsertId()
-	if err2 != nil {
-		return 0, err2
+	id, err := result.LastInsertId()
+	if err != nil {
+		apperrors.MySQLExecError.Wrap(err, "fail to save data")
+		return 0, err
 	}
 	return id, nil
 }
