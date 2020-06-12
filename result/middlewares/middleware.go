@@ -2,9 +2,9 @@ package middlewares
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
+	"app/apperrors"
 	"app/stores"
 )
 
@@ -36,14 +36,14 @@ func AuthAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		conn, e := stores.ConnectRedis()
 		if e != nil {
-			log.Fatal("cannot connect redis: ", e)
+			apperrors.ErrorHandler(e)
 		}
 		defer conn.Close()
 		sessionID, _ := stores.GetSessionID(req)
 
 		userid, e3 := stores.GetSessionValue(sessionID, "userid", conn)
 		if e3 != nil {
-			log.Println("cannot get session key userid: ", e3)
+			apperrors.ErrorHandler(e3)
 		}
 
 		if userid != "" {
@@ -59,14 +59,14 @@ func AuthSuperAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		conn, err := stores.ConnectRedis()
 		if err != nil {
-			log.Fatal("cannot connect redis: ", err)
+			apperrors.ErrorHandler(err)
 		}
 		defer conn.Close()
 		sessionID, _ := stores.GetSessionID(req)
 
 		auth, err2 := stores.GetSessionValue(sessionID, "auth", conn)
 		if err2 != nil {
-			log.Println("cannot get session key userid: ", err2)
+			apperrors.ErrorHandler(err2)
 		}
 
 		if auth == "true" {
