@@ -16,9 +16,9 @@ func main() {
 
 	r := routers.CreateRouter()
 
-	db, e := models.ConnectDB()
-	if e != nil {
-		log.Fatal(apperrors.GetType(e), "||", apperrors.GetMessage(e), "||", e)
+	db, err := models.ConnectDB()
+	if err != nil {
+		log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
 	}
 
 	if err := models.CreateTable(db); err != nil {
@@ -28,14 +28,14 @@ func main() {
 		log.Println("success to create adminuser table")
 	}
 
-	user, err2 := models.GetUserData(db, "admin")
-	if err2 != nil {
-		log.Fatal(apperrors.GetType(err2), "||", apperrors.GetMessage(err2), "||", err2)
+	user, err := models.GetUserData(db, "admin")
+	if err != nil {
+		log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
 	}
 	if user.UserID != "admin" {
-		err3 := models.UserCreate(db, "admin", "admin", 1)
-		if err3 != nil {
-			log.Fatal(apperrors.GetType(err3), "||", apperrors.GetMessage(err3), "||", err3)
+		err = models.UserCreate(db, "admin", "admin", 1)
+		if err != nil {
+			log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
 		} else {
 			log.Println("success to create super admin user")
 		}
@@ -43,7 +43,7 @@ func main() {
 
 	db.Close()
 
-	err := http.ListenAndServe(":"+port, r)
+	err = http.ListenAndServe(":"+port, r)
 	if err != nil {
 		err = apperrors.HTTPServerPortListenFailed.Wrap(err, "server cannot listen port")
 		log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
