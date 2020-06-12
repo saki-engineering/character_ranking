@@ -16,9 +16,6 @@ func main() {
 
 	r := routers.CreateRouter()
 
-	fs := http.FileServer(http.Dir("./resources"))
-	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
-
 	db, e := models.ConnectDB()
 	if e != nil {
 		log.Fatal(apperrors.GetType(e), "||", apperrors.GetMessage(e), "||", e)

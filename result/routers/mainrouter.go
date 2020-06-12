@@ -3,6 +3,7 @@ package routers
 import (
 	"app/handlers"
 	"app/middlewares"
+	"net/http"
 
 	"github.com/gorilla/mux"
 )
@@ -24,6 +25,9 @@ func CreateRouter() *mux.Router {
 	s2.HandleFunc("/userform", handlers.CreateUserFormHandler).Methods("GET")
 	s2.HandleFunc("/userform", handlers.CreateUserHandler).Methods("POST")
 	s2.HandleFunc("/newuser", handlers.CheckUserHandler)
+
+	fs := http.FileServer(http.Dir("./resources"))
+	r.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
 
 	r.Use(middlewares.Logging)
 	r.Use(middlewares.CheckSessionID)
