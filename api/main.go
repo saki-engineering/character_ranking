@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"app/apperrors"
-	"app/middlewares"
 	"app/models"
 	"app/routers"
 )
@@ -31,7 +30,6 @@ func main() {
 	db.Close()
 
 	r := routers.CreateRouter()
-	r.Use(middlewares.Logging)
 
 	err = http.ListenAndServe(":"+port, r)
 	if err != nil {
