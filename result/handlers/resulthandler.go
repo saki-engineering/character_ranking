@@ -14,6 +14,8 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("result/index")
 	if err != nil {
 		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 
 	client := new(http.Client)
@@ -22,6 +24,8 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 	if e != nil {
 		e = apperrors.VoteAPIRequestError.Wrap(e, "cannot get vote data")
 		apperrors.ErrorHandler(e)
+		http.Error(w, apperrors.GetMessage(e), http.StatusInternalServerError)
+		return
 	}
 	defer res.Body.Close()
 
@@ -29,12 +33,16 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 	if err2 != nil {
 		err2 = apperrors.VoteAPIResponseReadFailed.Wrap(err2, "cannot get vote data")
 		apperrors.ErrorHandler(err2)
+		http.Error(w, apperrors.GetMessage(err2), http.StatusInternalServerError)
+		return
 	}
 
 	var data []VoteResult
 	if err3 := json.Unmarshal(b, &data); err3 != nil {
 		err3 = apperrors.VoteAPIResponseReadFailed.Wrap(err3, "cannot get vote data")
 		apperrors.ErrorHandler(err3)
+		http.Error(w, apperrors.GetMessage(err3), http.StatusInternalServerError)
+		return
 	}
 
 	for _, votedata := range data {
@@ -53,6 +61,8 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 	conn, e := stores.ConnectRedis()
 	if e != nil {
 		apperrors.ErrorHandler(e)
+		http.Error(w, apperrors.GetMessage(e), http.StatusInternalServerError)
+		return
 	}
 	defer conn.Close()
 	sessionID, _ := stores.GetSessionID(req)
@@ -65,5 +75,7 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 }

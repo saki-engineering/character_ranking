@@ -14,6 +14,8 @@ func AdminRootHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("admin/index")
 	if err != nil {
 		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 
 	page := new(Page)
@@ -22,6 +24,8 @@ func AdminRootHandler(w http.ResponseWriter, req *http.Request) {
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -30,6 +34,8 @@ func CreateUserFormHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("admin/form")
 	if err != nil {
 		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 
 	page := new(Page)
@@ -37,6 +43,8 @@ func CreateUserFormHandler(w http.ResponseWriter, req *http.Request) {
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -47,6 +55,8 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 	conn, err2 := stores.ConnectRedis()
 	if err2 != nil {
 		apperrors.ErrorHandler(err2)
+		http.Error(w, apperrors.GetMessage(err2), http.StatusInternalServerError)
+		return
 	}
 	defer conn.Close()
 	sessionID, _ := stores.GetSessionID(req)
@@ -57,7 +67,8 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 	db, e := models.ConnectDB()
 	if e != nil {
 		apperrors.ErrorHandler(e)
-		log.Fatal("connect DB: ", e)
+		http.Error(w, apperrors.GetMessage(e), http.StatusInternalServerError)
+		return
 	}
 	defer db.Close()
 
@@ -69,6 +80,8 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 	err := models.UserCreate(db, req.Form.Get("userid"), req.Form.Get("password"), auth)
 	if err != nil {
 		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	} else {
 		log.Println("success to create admin user")
 	}
@@ -80,11 +93,15 @@ func CheckUserHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("admin/newuser")
 	if err != nil {
 		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 
 	conn, err2 := stores.ConnectRedis()
 	if err2 != nil {
 		apperrors.ErrorHandler(err2)
+		http.Error(w, apperrors.GetMessage(err2), http.StatusInternalServerError)
+		return
 	}
 	defer conn.Close()
 	sessionID, _ := stores.GetSessionID(req)
@@ -97,6 +114,8 @@ func CheckUserHandler(w http.ResponseWriter, req *http.Request) {
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
 	}
 
 	stores.DeleteSessionValue(sessionID, "newuserid", conn)

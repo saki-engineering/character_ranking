@@ -37,6 +37,8 @@ func AuthAdmin(next http.Handler) http.Handler {
 		conn, e := stores.ConnectRedis()
 		if e != nil {
 			apperrors.ErrorHandler(e)
+			http.Error(w, apperrors.GetMessage(e), http.StatusInternalServerError)
+			return
 		}
 		defer conn.Close()
 		sessionID, _ := stores.GetSessionID(req)
@@ -44,6 +46,8 @@ func AuthAdmin(next http.Handler) http.Handler {
 		userid, e3 := stores.GetSessionValue(sessionID, "userid", conn)
 		if e3 != nil {
 			apperrors.ErrorHandler(e3)
+			http.Error(w, apperrors.GetMessage(e3), http.StatusInternalServerError)
+			return
 		}
 
 		if userid != "" {
@@ -60,6 +64,8 @@ func AuthSuperAdmin(next http.Handler) http.Handler {
 		conn, err := stores.ConnectRedis()
 		if err != nil {
 			apperrors.ErrorHandler(err)
+			http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+			return
 		}
 		defer conn.Close()
 		sessionID, _ := stores.GetSessionID(req)
@@ -67,6 +73,8 @@ func AuthSuperAdmin(next http.Handler) http.Handler {
 		auth, err2 := stores.GetSessionValue(sessionID, "auth", conn)
 		if err2 != nil {
 			apperrors.ErrorHandler(err2)
+			http.Error(w, apperrors.GetMessage(err2), http.StatusInternalServerError)
+			return
 		}
 
 		if auth == "true" {
