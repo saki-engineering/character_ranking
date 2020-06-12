@@ -14,7 +14,7 @@ func ViewTopHandler(w http.ResponseWriter, req *http.Request) {
 
 	page := new(Page)
 	page.Title = "Character rankinig!"
-	err = tmpl.Execute(w, page)
+	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
 	}
@@ -29,7 +29,7 @@ func ViewAboutHandler(w http.ResponseWriter, req *http.Request) {
 
 	page := new(Page)
 	page.Title = "Character rankinig!"
-	err = tmpl.Execute(w, page)
+	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
 	}
@@ -44,7 +44,7 @@ func ViewFaqHandler(w http.ResponseWriter, req *http.Request) {
 
 	page := new(Page)
 	page.Title = "Character rankinig!"
-	err = tmpl.Execute(w, page)
+	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
 	}

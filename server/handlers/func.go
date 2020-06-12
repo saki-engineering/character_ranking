@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"net/http"
 	"net/url"
 	"os"
 	"text/template"
@@ -13,6 +14,15 @@ func loadTemplate(name string) (*template.Template, error) {
 		"templates/partials/_footer.html",
 	)
 	return tmpl, err
+}
+
+func executeTemplate(w http.ResponseWriter, tmpl *template.Template, page *Page) error {
+	err := tmpl.Execute(w, page)
+
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func apiURLString(path string) string {

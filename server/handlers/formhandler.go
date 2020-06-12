@@ -39,7 +39,7 @@ func FormHandler(w http.ResponseWriter, req *http.Request) {
 	page.Title = "form"
 	page.Prefecture = prefecture
 	page.Age = age
-	err = tmpl.Execute(w, page)
+	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
 	}

@@ -21,7 +21,7 @@ func CharacterHandler(w http.ResponseWriter, req *http.Request) {
 	page := new(Page)
 	page.Title = "Characters!"
 	page.Character = charas
-	err = tmpl.Execute(w, page)
+	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
 	}
@@ -38,7 +38,7 @@ func CharacterDetailHandler(w http.ResponseWriter, req *http.Request) {
 	page := new(Page)
 	page.Title = vars["name"]
 	page.Description = desp[vars["name"]]
-	err = tmpl.Execute(w, page)
+	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
 	}
@@ -89,7 +89,7 @@ func CharacterVotedHandler(w http.ResponseWriter, req *http.Request) {
 
 	page := new(Page)
 	page.Title = "Completed!"
-	err = tmpl.Execute(w, page)
+	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		log.Fatal("Execute on viewHandler: ", err)
 	}
