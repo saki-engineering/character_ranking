@@ -8,7 +8,7 @@ const (
 	Unknown ErrorType = 0
 
 	// DBConnectionFailed DB接続に関するエラーコード
-	DBConnectionFailed ErrorType = 1
+	DBConnectionFailed ErrorType = 10
 
 	// MySQLSetUpError package mysqlのテーブル作成に関連するエラーコード
 	MySQLSetUpError ErrorType = 20
