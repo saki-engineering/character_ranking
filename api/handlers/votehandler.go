@@ -80,7 +80,9 @@ func CharaResultHandler(w http.ResponseWriter, req *http.Request) {
 
 	bytes, err := json.Marshal(data)
 	if err != nil {
-		log.Println("fail json Marshal: ", err)
+		apperrors.JSONFormatFailed.Wrap(err, "fail to create json data")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 	}
 	w.Write([]byte(string(bytes)))
 }
