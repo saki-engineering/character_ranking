@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 // ResultRootHandler /resultのハンドラ
@@ -66,6 +68,28 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 		page.UserID = userid
 		page.LogIn = true
 	}
+
+	err = executeTemplate(w, tmpl, page)
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
+}
+
+// CharacterResultHandler /result/{name}のハンドラ
+func CharacterResultHandler(w http.ResponseWriter, req *http.Request) {
+	tmpl, err := loadTemplate("result/detail")
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
+
+	vars := mux.Vars(req)
+
+	page := new(Page)
+	page.Title = vars["name"]
 
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
