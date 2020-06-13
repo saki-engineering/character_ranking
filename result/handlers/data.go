@@ -1,5 +1,7 @@
 package handlers
 
+import "database/sql"
+
 //Page ... htmlに渡す値をまとめた構造体
 type Page struct {
 	Title     string
@@ -7,6 +9,7 @@ type Page struct {
 	LogIn     bool
 	Admin     bool
 	Character []VoteResult
+	Vote      []Vote
 	NewUser   NewAdmin
 }
 
@@ -15,6 +18,17 @@ type VoteResult struct {
 	ID   int `json:"id,string"`
 	Name string
 	Vote int `json:"vote"`
+}
+
+// Vote ユーザーが投票した票を表す構造体
+type Vote struct {
+	Chara       string         `json:"character"`
+	User        int            `json:"user"`
+	Age         int            `json:"age"`
+	Gender      int            `json:"gender"`
+	Address     int            `json:"address"`
+	CreatedTime string         `json:"created_at"`
+	IP          sql.NullString `json:"ip"`
 }
 
 // NewAdmin 新規作成したユーザーの情報

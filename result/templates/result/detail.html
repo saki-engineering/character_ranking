@@ -2,6 +2,27 @@
 
 <h1>hello,({{.UserID}})</h1>
 
-<button type="button" onclick="location.href='/'" class="btn btn-primary">戻る</button>
+<table>
+    <tr>
+        <th>user</th>
+        <th>age</th>
+        <th>gender</th>
+        <th>address</th>
+        <th>created_at</th>
+        <th>IP</th>
+    </tr>
+    {{ range $v := .Vote }}
+        <tr>
+            <td>{{ $v.User }}</td>
+            <td>{{ $v.Age }}</td>
+            <td>{{ $v.Gender }}</td>
+            <td>{{ $v.Address }}</td>
+            <td>{{ $v.CreatedTime }}</td>
+            <td>{{ $v.IP }}</td>
+        </tr>
+    {{ end }}
+</table>
+
+<button type="button" onclick="location.href='/result'" class="btn btn-primary">戻る</button>
 
 {{template "footer"}}

@@ -46,6 +46,7 @@ type Page struct {
 	LogIn     bool
 	Admin     bool
 	Character []VoteResult
+	Vote      []Vote
 	NewUser   NewAdmin
 }
 
@@ -69,6 +70,14 @@ type NewAdmin struct {
   - ID : エントリーNo
   - Name : キャラクター名
   - Vote : 得票数
+- Vote : 票の情報
+  - Chara : 投票したキャラクター
+  - User : 投票したユーザー
+  - Age : ユーザーの年齢
+  - Gender : ユーザーの性別
+  - Address : ユーザーの居住都道府県
+  - CreatedTime : 投票時間
+  - IP : 投票元IP
 - NewAdmin : 新規作成したユーザー情報を格納
   - UserID : ユーザーID
   - Password : パスワード
@@ -88,6 +97,20 @@ type VoteResult struct {
 }
 ```
 `json.Unmarshal([]byte, *[]VoteResult)`を利用することで、jsonキー"id"が"ID"に、キー"vote"が"Vote"に変換される。
+
+#### Vote(http/templateでも使用)
+```golang
+type Vote struct {
+	Chara       string         `json:"character"`
+	User        int            `json:"user"`
+	Age         int            `json:"age"`
+	Gender      int            `json:"gender"`
+	Address     int            `json:"address"`
+	CreatedTime string         `json:"created_at"`
+	IP          sql.NullString `json:"ip"`
+}
+```
+`json.Unmarshal([]byte, *[]Vote)`を利用することで、タグがjsonキーに変換される。
 
 ### sessionフィールド一覧
 - userid : ログイン中のユーザーID
