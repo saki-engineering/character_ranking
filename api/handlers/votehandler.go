@@ -80,7 +80,7 @@ func CharaResultHandler(w http.ResponseWriter, req *http.Request) {
 
 	bytes, err := json.Marshal(data)
 	if err != nil {
-		log.Println("fail json Marshal: ", err2)
+		log.Println("fail json Marshal: ", err)
 	}
 	w.Write([]byte(string(bytes)))
 }
@@ -98,8 +98,8 @@ func VoteSammaryHandler(w http.ResponseWriter, req *http.Request) {
 		log.Println("fail GetResultSummary: ", err)
 	}
 
-	bytes, err2 := json.Marshal(data)
-	if err2 != nil {
+	bytes, err := json.Marshal(data)
+	if err != nil {
 		apperrors.JSONFormatFailed.Wrap(err, "fail to create json data")
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
