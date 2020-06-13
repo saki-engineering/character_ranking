@@ -23,6 +23,12 @@ type Result struct {
 	Vote  int    `json:"vote"`
 }
 
+// エントリーNoとキャラ名をセットにした構造体
+type chara struct {
+	ID   int    // エントリーNo.
+	Name string // キャラ名
+}
+
 // ConnectDB DBと接続してポインタを返す
 func ConnectDB() (*sql.DB, error) {
 	dbDriver := "mysql"
@@ -44,6 +50,27 @@ func ConnectDB() (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func countCharasTableRow(db *sql.DB) (int64, error) {
+	const sqlStr = `SELECT COUNT(*) FROM charas;`
+	var cnt int64
+
+	rows, err := db.Query(sqlStr)
+	if err != nil {
+		err = apperrors.MySQLQueryError.Wrap(err, "cannot get data from DB")
+		return 0, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&cnt)
+		if err != nil {
+			err = apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
+			return 0, err
+		}
+	}
+	return cnt, nil
 }
 
 // CreateTable 投票結果を入れるテーブルがなければ作る
@@ -73,6 +100,34 @@ func CreateTable(db *sql.DB) error {
 		apperrors.MySQLSetUpError.Wrap(err, "fail to set up DB")
 		return err
 	}
+
+	const createCharaTable = `CREATE TABLE IF NOT EXISTS charas(
+		id          INT UNSIGNED NOT NULL,
+		chara       VARCHAR(20) NOT NULL
+	);`
+
+	_, err = db.Exec(createCharaTable)
+	if err != nil {
+		apperrors.MySQLSetUpError.Wrap(err, "fail to set up DB")
+		return err
+	}
+
+	cnt, err := countCharasTableRow(db)
+	if err != nil {
+		apperrors.MySQLSetUpError.Wrap(err, "fail to set up DB")
+		return err
+	}
+	if cnt == 0 {
+		const sqlStr = `INSERT INTO charas(id, chara) VALUES (?, ?);`
+		for _, chara := range charas {
+			_, err = db.Exec(sqlStr, chara.ID, chara.Name)
+			if err != nil {
+				apperrors.MySQLExecError.Wrap(err, "fail to save data")
+				return err
+			}
+		}
+	}
+
 	return nil
 }
 
