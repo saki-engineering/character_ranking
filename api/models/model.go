@@ -19,8 +19,8 @@ type Vote struct {
 
 // Result キャラクターごとの得票数をまとめた構造体
 type Result struct {
-	Chara string `json:"name"`
-	Vote  int    `json:"vote"`
+	CharaID string `json:"id"`
+	Vote    int    `json:"vote"`
 }
 
 // エントリーNoとキャラ名をセットにした構造体
@@ -193,7 +193,10 @@ func GetCharaVoteData(db *sql.DB, chara string) ([]Vote, error) {
 
 // GetResultSummary 各キャラとその得票数のデータを取得
 func GetResultSummary(db *sql.DB) ([]Result, error) {
-	const sqlStr = `SELECT chara, count(*) FROM votes group by chara;`
+	const sqlStr = `SELECT charas.id, count(*)
+					FROM charas
+					right join votes on charas.chara = votes.chara
+					group by charas.id;`
 
 	rows, err := db.Query(sqlStr)
 	if err != nil {
@@ -205,7 +208,7 @@ func GetResultSummary(db *sql.DB) ([]Result, error) {
 	dataArray := make([]Result, 0)
 	for rows.Next() {
 		var data Result
-		err := rows.Scan(&data.Chara, &data.Vote)
+		err := rows.Scan(&data.CharaID, &data.Vote)
 		if err != nil {
 			apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
 			return nil, err

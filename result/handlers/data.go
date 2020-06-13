@@ -12,9 +12,9 @@ type Page struct {
 
 // VoteResult キャラクターごとの得票数をまとめた構造体
 type VoteResult struct {
-	ID   int
-	Name string `json:"name"`
-	Vote int    `json:"vote"`
+	ID   int `json:"id,string"`
+	Name string
+	Vote int `json:"vote"`
 }
 
 // NewAdmin 新規作成したユーザーの情報

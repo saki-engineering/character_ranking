@@ -46,12 +46,7 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	for _, votedata := range data {
-		for i, chara := range charas {
-			if chara.Name == votedata.Name {
-				charas[i].Vote = votedata.Vote
-				break
-			}
-		}
+		charas[votedata.ID-1].Vote = votedata.Vote
 	}
 
 	page := new(Page)
