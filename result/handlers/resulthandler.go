@@ -136,39 +136,38 @@ func UserDetailHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	/*
-		vars := mux.Vars(req)
+	vars := mux.Vars(req)
 
-		client := new(http.Client)
-		uStr := apiURLString("/vote/" + vars["name"])
-		res, err := client.Get(uStr)
-		if err != nil {
-			err = apperrors.VoteAPIRequestError.Wrap(err, "cannot get vote data")
-			apperrors.ErrorHandler(err)
-			http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
-			return
-		}
-		defer res.Body.Close()
+	client := new(http.Client)
+	uStr := apiURLString("/user/" + vars["gender"] + "/" + vars["agemin"])
+	res, err := client.Get(uStr)
+	if err != nil {
+		err = apperrors.VoteAPIRequestError.Wrap(err, "cannot get vote data")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
+	defer res.Body.Close()
 
-		b, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
-			apperrors.ErrorHandler(err)
-			http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
-			return
-		}
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
 
-		var data []Vote
-		if err = json.Unmarshal(b, &data); err != nil {
-			err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
-			apperrors.ErrorHandler(err)
-			http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
-			return
-		}
-	*/
+	var data []Vote
+	if err = json.Unmarshal(b, &data); err != nil {
+		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
 
 	page := new(Page)
 	page.Title = "view result"
+	page.Vote = data
 
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
