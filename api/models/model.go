@@ -13,6 +13,9 @@ import (
 type Vote struct {
 	Chara       string         `json:"character"`
 	User        int            `json:"user"`
+	Age         int            `json:"age"`
+	Gender      int            `json:"gender"`
+	Address     int            `json:"address"`
 	CreatedTime string         `json:"created_at"`
 	IP          sql.NullString `json:"ip"`
 }
@@ -169,7 +172,9 @@ func GetAllVoteData(db *sql.DB) ([]Vote, error) {
 
 // GetCharaVoteData 指定キャラクターの投票データを取得
 func GetCharaVoteData(db *sql.DB, chara string) ([]Vote, error) {
-	const sqlStr = `SELECT * FROM votes WHERE chara=?;`
+	const sqlStr = `SELECT users.id, users.age, users.gender, users.address, votes.created_at, votes.ip
+					FROM votes LEFT JOIN users ON users.id = votes.user
+					WHERE votes.chara = ?;`
 
 	rows, err := db.Query(sqlStr, chara)
 	if err != nil {
@@ -181,7 +186,7 @@ func GetCharaVoteData(db *sql.DB, chara string) ([]Vote, error) {
 	dataArray := make([]Vote, 0)
 	for rows.Next() {
 		var data Vote
-		err := rows.Scan(&data.Chara, &data.User, &data.CreatedTime, &data.IP)
+		err := rows.Scan(&data.User, &data.Age, &data.Gender, &data.Address, &data.CreatedTime, &data.IP)
 		if err != nil {
 			apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
 			return nil, err
