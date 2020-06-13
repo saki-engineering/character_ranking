@@ -223,6 +223,32 @@ func GetResultSummary(db *sql.DB) ([]Result, error) {
 	return dataArray, nil
 }
 
+// GetUserSummary 性別:gender・年齢:agemin~agemin+9の人たちの投票をみる
+func GetUserSummary(db *sql.DB, gender, agemin int) ([]Vote, error) {
+	const sqlStr = `SELECT users.id, users.address, votes.chara, votes.created_at, votes.ip
+					FROM votes LEFT JOIN users ON users.id = votes.user
+					WHERE users.gender = ? AND users.age BETWEEN ? AND ?;`
+
+	rows, err := db.Query(sqlStr, gender, agemin, agemin+9)
+	if err != nil {
+		apperrors.MySQLQueryError.Wrap(err, "cannot get data")
+		return nil, err
+	}
+	defer rows.Close()
+
+	dataArray := make([]Vote, 0)
+	for rows.Next() {
+		var data Vote
+		err := rows.Scan(&data.User, &data.Address, &data.Chara, &data.CreatedTime, &data.IP)
+		if err != nil {
+			apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
+			return nil, err
+		}
+		dataArray = append(dataArray, data)
+	}
+	return dataArray, nil
+}
+
 // InsertUsers 投票に参加したユーザーのデータをDBに追加
 func InsertUsers(db *sql.DB, age, gender, address string) (int64, error) {
 	const sqlStr = `INSERT INTO users(age, gender, address) VALUES (?, ?, ?);`

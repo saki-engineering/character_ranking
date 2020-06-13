@@ -3,11 +3,14 @@ package handlers
 import (
 	"app/apperrors"
 	"app/models"
+	"encoding/json"
 
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 // CreateUserHandler /user/のPOSTハンドラ
@@ -33,4 +36,33 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 
 	printid := strconv.FormatInt(id, 10)
 	fmt.Fprintf(w, printid)
+}
+
+// UserResultHandler /user/{gender}/{agemin}のGETハンドラ
+func UserResultHandler(w http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+
+	db, err := models.ConnectDB()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+
+	gender, _ := strconv.Atoi(vars["gender"])
+	agemin, _ := strconv.Atoi(vars["agemin"])
+
+	data, err := models.GetUserSummary(db, gender, agemin)
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
+
+	bytes, err := json.Marshal(data)
+	if err != nil {
+		log.Println("fail json Marshal: ", err)
+	}
+	w.Write([]byte(string(bytes)))
 }
