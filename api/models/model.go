@@ -267,8 +267,8 @@ func GetUserData(db *sql.DB) ([]User, error) {
 										   when (age between 60 and 69) then 6
 										   when (age between 70 and 79) then 7
 										   when (age between 80 and 89) then 8
-										   else 9 end) as age, gender
-					FROM users GROUP BY age, gender;`
+										   else 9 end) as agelayer, gender
+					FROM users GROUP BY agelayer, gender;`
 
 	rows, err := db.Query(sqlStr)
 	if err != nil {
