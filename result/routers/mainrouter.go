@@ -19,6 +19,7 @@ func CreateRouter() *mux.Router {
 
 	s1 := r.PathPrefix("/result").Subrouter()
 	s1.HandleFunc("", handlers.ResultRootHandler)
+	s1.HandleFunc("/user", handlers.UserSummaryHandler)
 	s1.HandleFunc("/{name}", handlers.CharacterResultHandler)
 	s1.HandleFunc("/user/{gender}/{agemin}", handlers.UserDetailHandler)
 

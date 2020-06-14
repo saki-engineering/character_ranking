@@ -10,6 +10,7 @@ type Page struct {
 	Admin     bool
 	Character []VoteResult
 	Vote      []Vote
+	VoteUser  []User
 	NewUser   NewAdmin
 }
 
@@ -29,6 +30,13 @@ type Vote struct {
 	Address     int            `json:"address"`
 	CreatedTime string         `json:"created_at"`
 	IP          sql.NullString `json:"ip"`
+}
+
+// User 投票に参加した人の構造体
+type User struct {
+	Num    int `json:"number"`
+	Age    int `json:"age"`
+	Gender int `json:"gender"`
 }
 
 // NewAdmin 新規作成したユーザーの情報

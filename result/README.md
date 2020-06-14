@@ -14,7 +14,7 @@
 ├── result
 │    ├─/       				 # キャラクターごとの得票数表示
 │    ├──/{name} 			 # キャラクターごとの詳細分析ページ予定
-│    └─/user				 # (未実装)
+│    └─/user				 # ユーザー層ごとの投票数を表示
 │       └─/{gender}/{agemin} # ある性別・年代ごとの投票詳細ページ
 └── admin
      ├─/                # adminユーザーページ
@@ -49,6 +49,7 @@ type Page struct {
 	Admin     bool
 	Character []VoteResult
 	Vote      []Vote
+	VoteUser  []User
 	NewUser   NewAdmin
 }
 
@@ -56,6 +57,22 @@ type VoteResult struct {
 	ID   int `json:"id,string"`
 	Name string
 	Vote int `json:"vote"`
+}
+
+type Vote struct {
+	Chara       string         `json:"character"`
+	User        int            `json:"user"`
+	Age         int            `json:"age"`
+	Gender      int            `json:"gender"`
+	Address     int            `json:"address"`
+	CreatedTime string         `json:"created_at"`
+	IP          sql.NullString `json:"ip"`
+}
+
+type User struct {
+	Num    int `json:"number"`
+	Age    int `json:"age"`
+	Gender int `json:"gender"`
 }
 
 type NewAdmin struct {
@@ -80,6 +97,10 @@ type NewAdmin struct {
   - Address : ユーザーの居住都道府県
   - CreatedTime : 投票時間
   - IP : 投票元IP
+- VoteUser : 投票したユーザーの情報
+  - Num : 特定層のユーザーの数
+  - Age : 年代層
+  - Gender : 性別
 - NewAdmin : 新規作成したユーザー情報を格納
   - UserID : ユーザーID
   - Password : パスワード
@@ -113,6 +134,16 @@ type Vote struct {
 }
 ```
 `json.Unmarshal([]byte, *[]Vote)`を利用することで、タグがjsonキーに変換される。
+
+#### User(http/templateでも使用)
+```golang
+type User struct {
+	Num    int `json:"number"`
+	Age    int `json:"age"`
+	Gender int `json:"gender"`
+}
+```
+`json.Unmarshal([]byte, *[]User)`を利用することで、タグがjsonキーに変換される。
 
 ### sessionフィールド一覧
 - userid : ログイン中のユーザーID

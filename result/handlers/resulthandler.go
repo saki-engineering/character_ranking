@@ -127,6 +127,54 @@ func CharacterResultHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// UserSummaryHandler /result/userのハンドラ
+func UserSummaryHandler(w http.ResponseWriter, req *http.Request) {
+	tmpl, err := loadTemplate("result/user")
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
+
+	client := new(http.Client)
+	uStr := apiURLString("/user/")
+	res, err := client.Get(uStr)
+	if err != nil {
+		err = apperrors.VoteAPIRequestError.Wrap(err, "cannot get vote data")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
+	defer res.Body.Close()
+
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
+
+	var data []User
+	if err = json.Unmarshal(b, &data); err != nil {
+		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
+
+	page := new(Page)
+	page.Title = "view result"
+	page.VoteUser = data
+
+	err = executeTemplate(w, tmpl, page)
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
+}
+
 // UserDetailHandler /result/user/{gender}/{agemin}のハンドラ
 func UserDetailHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("result/userdetail")
