@@ -26,6 +26,13 @@ type Result struct {
 	Vote    int    `json:"vote"`
 }
 
+// User 投票に参加した人の構造体
+type User struct {
+	Num    int `json:"number"`
+	Age    int `json:"age"`
+	Gender int `json:"gender"`
+}
+
 // エントリーNoとキャラ名をセットにした構造体
 type chara struct {
 	ID   int    // エントリーNo.
@@ -240,6 +247,40 @@ func GetUserSummary(db *sql.DB, gender, agemin int) ([]Vote, error) {
 	for rows.Next() {
 		var data Vote
 		err := rows.Scan(&data.User, &data.Address, &data.Chara, &data.CreatedTime, &data.IP)
+		if err != nil {
+			apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
+			return nil, err
+		}
+		dataArray = append(dataArray, data)
+	}
+	return dataArray, nil
+}
+
+// GetUserData 投票に参加した人の一覧データを取得
+func GetUserData(db *sql.DB) ([]User, error) {
+	const sqlStr = `SELECT count(*), (case when (age between 0 and 9) then 0
+										   when (age between 10 and 19) then 1
+										   when (age between 20 and 29) then 2
+										   when (age between 30 and 39) then 3
+										   when (age between 40 and 49) then 4
+										   when (age between 50 and 59) then 5
+										   when (age between 60 and 69) then 6
+										   when (age between 70 and 79) then 7
+										   when (age between 80 and 89) then 8
+										   else 9 end) as age, gender
+					FROM users GROUP BY age, gender;`
+
+	rows, err := db.Query(sqlStr)
+	if err != nil {
+		apperrors.MySQLQueryError.Wrap(err, "cannot get data")
+		return nil, err
+	}
+	defer rows.Close()
+
+	dataArray := make([]User, 0)
+	for rows.Next() {
+		var data User
+		err := rows.Scan(&data.Num, &data.Age, &data.Gender)
 		if err != nil {
 			apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
 			return nil, err

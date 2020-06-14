@@ -13,6 +13,32 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// UserSummaryHandler /user/のGETハンドラ
+func UserSummaryHandler(w http.ResponseWriter, req *http.Request) {
+	db, err := models.ConnectDB()
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+
+	data, err := models.GetUserData(db)
+	if err != nil {
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		return
+	}
+
+	bytes, err := json.Marshal(data)
+	if err != nil {
+		apperrors.JSONFormatFailed.Wrap(err, "fail to create json data")
+		apperrors.ErrorHandler(err)
+		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+	}
+	w.Write([]byte(string(bytes)))
+}
+
 // CreateUserHandler /user/のPOSTハンドラ
 // テストするためには $curl -X POST -d "age=1&gender=1&address=1" localhost:9090/user/
 func CreateUserHandler(w http.ResponseWriter, req *http.Request) {

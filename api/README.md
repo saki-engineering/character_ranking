@@ -12,6 +12,7 @@
 │    ├─/summary # 各キャラの得票数一覧をjsonで取得
 │    └─/{name}  # {name}キャラの投票データをjsonで取得
 └── user
+	 ├─/(get)			  # 性別・年齢層ごとのユーザーの数をjsonで取得
      ├─/(post age=X&gender=Y&address=Z)
      │                    # ユーザーの作成→主キーのIDをbodyに入れて返却
      └─/{gender}/{agemin} # ある性別・年齢層の投票データをjsonで取得
@@ -46,6 +47,16 @@ type Vote struct {
 }
 ```
 「誰が、どのキャラクターに投票したのか」という票を表す構造体。`json.Marshal([]Vote)`実行時には、タグに記載されているjsonキーに変換される。
+
+#### User
+``` golang
+type User struct {
+	Num    int `json:"number"`
+	Age    int `json:"age"`
+	Gender int `json:"gender"`
+}
+```
+性別・年齢層ごとのユーザー数を表す構造体。`json.Marshal([]User)`実行時には、タグに記載されているjsonキーに変換される。
 
 #### Result
 ```golang
