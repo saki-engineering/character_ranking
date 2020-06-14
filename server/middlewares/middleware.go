@@ -20,9 +20,9 @@ func Logging(next http.Handler) http.Handler {
 // CheckSessionID セッションIDがなければ付与する
 func CheckSessionID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		id, err := stores.GetSessionID(req)
+		sessionID, err := stores.GetSessionID(req)
 
-		if err != nil || id == "" {
+		if err != nil || sessionID == "" {
 			stores.SetSessionID(w)
 		}
 

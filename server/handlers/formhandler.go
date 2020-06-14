@@ -21,8 +21,8 @@ func FormHandler(w http.ResponseWriter, req *http.Request) {
 	defer conn.Close()
 	sessionID, _ := stores.GetSessionID(req)
 
-	voting, _ := stores.GetSessionValue(sessionID, "voting", conn)
-	if voting != "true" {
+	nowVoting, _ := stores.GetSessionValue(sessionID, "voting", conn)
+	if nowVoting != "true" {
 		http.Redirect(w, req, "/", http.StatusSeeOther)
 		return
 	}
@@ -34,7 +34,7 @@ func FormHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	age := make([]int, 99)
+	ageList := make([]int, 99)
 	for i := 0; i < 99; i++ {
 		age[i] = i + 1
 	}
@@ -42,7 +42,7 @@ func FormHandler(w http.ResponseWriter, req *http.Request) {
 	page := new(Page)
 	page.Title = "form"
 	page.Prefecture = prefecture
-	page.Age = age
+	page.Age = ageList
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
 		apperrors.ErrorHandler(err)
@@ -54,17 +54,20 @@ func FormHandler(w http.ResponseWriter, req *http.Request) {
 // FormVoteHandler アンケートフォームから投票した時のハンドラ
 func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
+	userAge := req.Form.Get("age")
+	userGender := req.Form.Get("gender")
+	userAddress := req.Form.Get("address")
+
 	//ここにuser登録処理
 	client := new(http.Client)
+	uStr := apiURLString("/user/")
 
-	uStr1 := apiURLString("/user/")
+	values := url.Values{}
+	values.Add("age", userAge)
+	values.Add("gender", userGender)
+	values.Add("address", userAddress)
 
-	values1 := url.Values{}
-	values1.Add("age", req.Form.Get("age"))
-	values1.Add("gender", req.Form.Get("gender"))
-	values1.Add("address", req.Form.Get("address"))
-
-	res, err := client.Post(uStr1, "application/x-www-form-urlencoded", strings.NewReader(values1.Encode()))
+	res, err := client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
 	if err != nil {
 		apperrors.VoteAPIRequestError.Wrap(err, "fail to vote")
 		apperrors.ErrorHandler(err)
@@ -73,8 +76,8 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer res.Body.Close()
 
-	b, err := ioutil.ReadAll(res.Body)
-	userID := string(b)
+	resBodyByteString, err := ioutil.ReadAll(res.Body)
+	userID := string(resBodyByteString)
 
 	// ユーザー情報をsessionに付与
 	conn, err := stores.ConnectRedis()
@@ -90,9 +93,9 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 	stores.DeleteSessionValue(sessionID, "voting", conn)
 
 	//投票処理が入る
-	uStr := apiURLString("/vote/")
+	uStr = apiURLString("/vote/")
 
-	values := url.Values{}
+	values = url.Values{}
 	values.Add("character", req.Form.Get("character"))
 	values.Add("user", userID)
 
@@ -104,6 +107,6 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	url := "/characters/" + req.Form.Get("character") + "/voted"
-	http.Redirect(w, req, url, http.StatusSeeOther)
+	redirectURL := "/characters/" + req.Form.Get("character") + "/voted"
+	http.Redirect(w, req, redirectURL, http.StatusSeeOther)
 }

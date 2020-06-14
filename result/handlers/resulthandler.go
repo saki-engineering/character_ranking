@@ -31,7 +31,7 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer res.Body.Close()
 
-	b, err := ioutil.ReadAll(res.Body)
+	resBodyByteString, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
 		apperrors.ErrorHandler(err)
@@ -39,16 +39,16 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var data []VoteResult
-	if err = json.Unmarshal(b, &data); err != nil {
+	var jsonParsedData []VoteResult
+	if err = json.Unmarshal(resBodyByteString, &jsonParsedData); err != nil {
 		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 
-	for _, votedata := range data {
-		charas[votedata.ID-1].Vote = votedata.Vote
+	for _, voteResultData := range jsonParsedData {
+		charas[voteResultData.ID-1].Vote = voteResultData.Vote
 	}
 
 	page := new(Page)
@@ -64,8 +64,8 @@ func ResultRootHandler(w http.ResponseWriter, req *http.Request) {
 	defer conn.Close()
 	sessionID, _ := stores.GetSessionID(req)
 
-	if userid, _ := stores.GetSessionValue(sessionID, "userid", conn); userid != "" {
-		page.UserID = userid
+	if nowLoginUserID, _ := stores.GetSessionValue(sessionID, "userid", conn); nowLoginUserID != "" {
+		page.UserID = nowLoginUserID
 		page.LogIn = true
 	}
 
@@ -99,7 +99,7 @@ func CharacterResultHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer res.Body.Close()
 
-	b, err := ioutil.ReadAll(res.Body)
+	resBodyByteString, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
 		apperrors.ErrorHandler(err)
@@ -107,8 +107,8 @@ func CharacterResultHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var data []Vote
-	if err = json.Unmarshal(b, &data); err != nil {
+	var jsonParsedData []Vote
+	if err = json.Unmarshal(resBodyByteString, &jsonParsedData); err != nil {
 		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
@@ -117,7 +117,7 @@ func CharacterResultHandler(w http.ResponseWriter, req *http.Request) {
 
 	page := new(Page)
 	page.Title = vars["name"]
-	page.Vote = data
+	page.Vote = jsonParsedData
 
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
@@ -147,7 +147,7 @@ func UserSummaryHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer res.Body.Close()
 
-	b, err := ioutil.ReadAll(res.Body)
+	resBodyByteString, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
 		apperrors.ErrorHandler(err)
@@ -155,8 +155,8 @@ func UserSummaryHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var data []User
-	if err = json.Unmarshal(b, &data); err != nil {
+	var jsonParsedData []User
+	if err = json.Unmarshal(resBodyByteString, &jsonParsedData); err != nil {
 		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
@@ -165,7 +165,7 @@ func UserSummaryHandler(w http.ResponseWriter, req *http.Request) {
 
 	page := new(Page)
 	page.Title = "view result"
-	page.VoteUser = data
+	page.VoteUser = jsonParsedData
 
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
@@ -197,7 +197,7 @@ func UserDetailHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer res.Body.Close()
 
-	b, err := ioutil.ReadAll(res.Body)
+	resBodyByteString, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
 		apperrors.ErrorHandler(err)
@@ -205,8 +205,8 @@ func UserDetailHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var data []Vote
-	if err = json.Unmarshal(b, &data); err != nil {
+	var jsonParsedData []Vote
+	if err = json.Unmarshal(resBodyByteString, &jsonParsedData); err != nil {
 		err = apperrors.VoteAPIResponseReadFailed.Wrap(err, "cannot get vote data")
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
@@ -215,7 +215,7 @@ func UserDetailHandler(w http.ResponseWriter, req *http.Request) {
 
 	page := new(Page)
 	page.Title = "view result"
-	page.Vote = data
+	page.Vote = jsonParsedData
 
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {

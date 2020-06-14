@@ -55,6 +55,7 @@ func CharacterDetailHandler(w http.ResponseWriter, req *http.Request) {
 // CharacterVoteHandler 投票ボタンが押された時に、フォームに行くかVoted画面に行くかを判定する
 func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
+
 	conn, err := stores.ConnectRedis()
 	if err != nil {
 		apperrors.ErrorHandler(err)
@@ -64,21 +65,21 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 	defer conn.Close()
 	sessionID, _ := stores.GetSessionID(req)
 
-	user, err := stores.GetSessionValue(sessionID, "user", conn)
+	userID, err := stores.GetSessionValue(sessionID, "user", conn)
 	if err != nil {
 		stores.SetSessionValue(sessionID, "voting", "true", conn)
 		http.Redirect(w, req, "/form", http.StatusSeeOther)
 		return
 	}
+	votingCharacter := req.Form.Get("character")
 
 	//投票処理
 	client := new(http.Client)
-
 	uStr := apiURLString("/vote/")
 
 	values := url.Values{}
-	values.Add("character", req.Form.Get("character"))
-	values.Add("user", user)
+	values.Add("character", votingCharacter)
+	values.Add("user", userID)
 
 	_, err = client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
 	if err != nil {
@@ -88,8 +89,8 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	url := "/characters/" + req.Form.Get("character") + "/voted"
-	http.Redirect(w, req, url, http.StatusSeeOther)
+	redirectURL := "/characters/" + votingCharacter + "/voted"
+	http.Redirect(w, req, redirectURL, http.StatusSeeOther)
 }
 
 // CharacterVotedHandler 投票終了後の画面を表示

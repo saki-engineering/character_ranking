@@ -164,17 +164,17 @@ func GetAllVoteData(db *sql.DB) ([]Vote, error) {
 	}
 	defer rows.Close()
 
-	dataArray := make([]Vote, 0)
+	voteDataArray := make([]Vote, 0)
 	for rows.Next() {
-		var data Vote
-		err := rows.Scan(&data.Chara, &data.User, &data.CreatedTime, &data.IP)
+		var voteData Vote
+		err := rows.Scan(&voteData.Chara, &voteData.User, &voteData.CreatedTime, &voteData.IP)
 		if err != nil {
 			apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
 			return nil, err
 		}
-		dataArray = append(dataArray, data)
+		voteDataArray = append(voteDataArray, voteData)
 	}
-	return dataArray, nil
+	return voteDataArray, nil
 }
 
 // GetCharaVoteData 指定キャラクターの投票データを取得
@@ -190,17 +190,17 @@ func GetCharaVoteData(db *sql.DB, chara string) ([]Vote, error) {
 	}
 	defer rows.Close()
 
-	dataArray := make([]Vote, 0)
+	voteDataArray := make([]Vote, 0)
 	for rows.Next() {
-		var data Vote
-		err := rows.Scan(&data.User, &data.Age, &data.Gender, &data.Address, &data.CreatedTime, &data.IP)
+		var voteData Vote
+		err := rows.Scan(&voteData.User, &voteData.Age, &voteData.Gender, &voteData.Address, &voteData.CreatedTime, &voteData.IP)
 		if err != nil {
 			apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
 			return nil, err
 		}
-		dataArray = append(dataArray, data)
+		voteDataArray = append(voteDataArray, voteData)
 	}
-	return dataArray, nil
+	return voteDataArray, nil
 }
 
 // GetResultSummary 各キャラとその得票数のデータを取得
@@ -217,17 +217,17 @@ func GetResultSummary(db *sql.DB) ([]Result, error) {
 	}
 	defer rows.Close()
 
-	dataArray := make([]Result, 0)
+	resultDataArray := make([]Result, 0)
 	for rows.Next() {
-		var data Result
-		err := rows.Scan(&data.CharaID, &data.Vote)
+		var resultData Result
+		err := rows.Scan(&resultData.CharaID, &resultData.Vote)
 		if err != nil {
 			apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
 			return nil, err
 		}
-		dataArray = append(dataArray, data)
+		resultDataArray = append(resultDataArray, resultData)
 	}
-	return dataArray, nil
+	return resultDataArray, nil
 }
 
 // GetUserSummary 性別:gender・年齢:agemin~agemin+9の人たちの投票をみる
@@ -243,17 +243,17 @@ func GetUserSummary(db *sql.DB, gender, agemin int) ([]Vote, error) {
 	}
 	defer rows.Close()
 
-	dataArray := make([]Vote, 0)
+	voteDataArray := make([]Vote, 0)
 	for rows.Next() {
-		var data Vote
-		err := rows.Scan(&data.User, &data.Address, &data.Chara, &data.CreatedTime, &data.IP)
+		var voteData Vote
+		err := rows.Scan(&voteData.User, &voteData.Address, &voteData.Chara, &voteData.CreatedTime, &voteData.IP)
 		if err != nil {
 			apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
 			return nil, err
 		}
-		dataArray = append(dataArray, data)
+		voteDataArray = append(voteDataArray, voteData)
 	}
-	return dataArray, nil
+	return voteDataArray, nil
 }
 
 // GetUserData 投票に参加した人の一覧データを取得
@@ -277,17 +277,17 @@ func GetUserData(db *sql.DB) ([]User, error) {
 	}
 	defer rows.Close()
 
-	dataArray := make([]User, 0)
+	userDataArray := make([]User, 0)
 	for rows.Next() {
-		var data User
-		err := rows.Scan(&data.Num, &data.Age, &data.Gender)
+		var userData User
+		err := rows.Scan(&userData.Num, &userData.Age, &userData.Gender)
 		if err != nil {
 			apperrors.MySQLDataFormatFailed.Wrap(err, "cannot get data from DB")
 			return nil, err
 		}
-		dataArray = append(dataArray, data)
+		userDataArray = append(userDataArray, userData)
 	}
-	return dataArray, nil
+	return userDataArray, nil
 }
 
 // InsertUsers 投票に参加したユーザーのデータをDBに追加
@@ -300,10 +300,10 @@ func InsertUsers(db *sql.DB, age, gender, address string) (int64, error) {
 		return 0, err
 	}
 
-	id, err := result.LastInsertId()
+	insertedUserID, err := result.LastInsertId()
 	if err != nil {
 		apperrors.MySQLExecError.Wrap(err, "fail to save data")
 		return 0, err
 	}
-	return id, nil
+	return insertedUserID, nil
 }

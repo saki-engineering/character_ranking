@@ -20,21 +20,21 @@ func VoteResultHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer db.Close()
 
-	data, err := models.GetAllVoteData(db)
+	voteStructsData, err := models.GetAllVoteData(db)
 	if err != nil {
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 
-	bytes, err := json.Marshal(data)
+	jsonByteString, err := json.Marshal(voteStructsData)
 	if err != nil {
 		apperrors.JSONFormatFailed.Wrap(err, "fail to create json data")
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte(string(bytes)))
+	w.Write([]byte(string(jsonByteString)))
 }
 
 // VoteCharaHandler /vote/のPOSTハンドラ
@@ -71,20 +71,20 @@ func CharaResultHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer db.Close()
 
-	data, err := models.GetCharaVoteData(db, vars["name"])
+	voteStructsData, err := models.GetCharaVoteData(db, vars["name"])
 	if err != nil {
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 
-	bytes, err := json.Marshal(data)
+	jsonByteString, err := json.Marshal(voteStructsData)
 	if err != nil {
 		apperrors.JSONFormatFailed.Wrap(err, "fail to create json data")
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 	}
-	w.Write([]byte(string(bytes)))
+	w.Write([]byte(string(jsonByteString)))
 }
 
 // VoteSammaryHandler /vote/summaryのGETハンドラ
@@ -95,17 +95,17 @@ func VoteSammaryHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer db.Close()
 
-	data, err := models.GetResultSummary(db)
+	resultStructsData, err := models.GetResultSummary(db)
 	if err != nil {
 		log.Println("fail GetResultSummary: ", err)
 	}
 
-	bytes, err := json.Marshal(data)
+	jsonByteString, err := json.Marshal(resultStructsData)
 	if err != nil {
 		apperrors.JSONFormatFailed.Wrap(err, "fail to create json data")
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte(string(bytes)))
+	w.Write([]byte(string(jsonByteString)))
 }

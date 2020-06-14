@@ -72,12 +72,14 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer db.Close()
 
-	auth := 0
+	newUserID := req.Form.Get("userid")
+	newUserPlainPassword := req.Form.Get("password")
+	newUserAuth := 0
 	if req.Form.Get("admin") == "on" {
-		auth = 1
+		newUserAuth = 1
 	}
 
-	err = models.UserCreate(db, req.Form.Get("userid"), req.Form.Get("password"), auth)
+	err = models.UserCreate(db, newUserID, newUserPlainPassword, newUserAuth)
 	if err != nil {
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -23,20 +22,20 @@ func UserSummaryHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer db.Close()
 
-	data, err := models.GetUserData(db)
+	userStructsData, err := models.GetUserData(db)
 	if err != nil {
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 
-	bytes, err := json.Marshal(data)
+	jsonByteString, err := json.Marshal(userStructsData)
 	if err != nil {
 		apperrors.JSONFormatFailed.Wrap(err, "fail to create json data")
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 	}
-	w.Write([]byte(string(bytes)))
+	w.Write([]byte(string(jsonByteString)))
 }
 
 // CreateUserHandler /user/のPOSTハンドラ
@@ -52,16 +51,15 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer db.Close()
 
-	id, err := models.InsertUsers(db, req.Form.Get("age"), req.Form.Get("gender"), req.Form.Get("address"))
+	insertedUserID, err := models.InsertUsers(db, req.Form.Get("age"), req.Form.Get("gender"), req.Form.Get("address"))
 	if err != nil {
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
-	log.Println("user insert success, id:", id)
 
-	printid := strconv.FormatInt(id, 10)
-	fmt.Fprintf(w, printid)
+	idString := strconv.FormatInt(insertedUserID, 10)
+	fmt.Fprintf(w, idString)
 }
 
 // UserResultHandler /user/{gender}/{agemin}のGETハンドラ
@@ -79,18 +77,18 @@ func UserResultHandler(w http.ResponseWriter, req *http.Request) {
 	gender, _ := strconv.Atoi(vars["gender"])
 	agemin, _ := strconv.Atoi(vars["agemin"])
 
-	data, err := models.GetUserSummary(db, gender, agemin)
+	voteStructData, err := models.GetUserSummary(db, gender, agemin)
 	if err != nil {
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 		return
 	}
 
-	bytes, err := json.Marshal(data)
+	jsonByteString, err := json.Marshal(voteStructData)
 	if err != nil {
 		apperrors.JSONFormatFailed.Wrap(err, "fail to create json data")
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 	}
-	w.Write([]byte(string(bytes)))
+	w.Write([]byte(string(jsonByteString)))
 }

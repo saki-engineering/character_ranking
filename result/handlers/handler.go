@@ -35,12 +35,12 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 	defer conn.Close()
 	sessionID, _ := stores.GetSessionID(req)
 
-	if userid, _ := stores.GetSessionValue(sessionID, "userid", conn); userid != "" {
-		page.UserID = userid
+	if nowLoginUserID, _ := stores.GetSessionValue(sessionID, "userid", conn); nowLoginUserID != "" {
+		page.UserID = nowLoginUserID
 		page.LogIn = true
 	}
 
-	if auth, _ := stores.GetSessionValue(sessionID, "auth", conn); auth == "true" {
+	if nowLoginUserAuth, _ := stores.GetSessionValue(sessionID, "auth", conn); nowLoginUserAuth == "true" {
 		page.Admin = true
 	}
 
@@ -74,6 +74,10 @@ func LoginPageHandler(w http.ResponseWriter, req *http.Request) {
 // LoginHandler /loginのPOSTハンドラ
 func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
+
+	formInputUserID := req.Form.Get("userid")
+	formInputUserPlainPassword := req.Form.Get("password")
+
 	db, err := models.ConnectDB()
 	if err != nil {
 		apperrors.ErrorHandler(err)
@@ -82,13 +86,13 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer db.Close()
 
-	user, err := models.GetUserData(db, req.Form.Get("userid"))
+	loginTryingUser, err := models.GetUserData(db, formInputUserID)
 	if err != nil {
 		http.Redirect(w, req, "/login", http.StatusSeeOther)
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(req.Form.Get("password")))
+	err = bcrypt.CompareHashAndPassword([]byte(loginTryingUser.HashedPassword), []byte(formInputUserPlainPassword))
 	// パスワードが正しくなかった場合はerrが返る
 	if err != nil {
 		http.Redirect(w, req, "/login", http.StatusSeeOther)
@@ -107,14 +111,14 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	newSessionID, _ := stores.SetSessionID(w)
 	stores.ReNameSessionID(oldSessionID, newSessionID, conn)
 
-	stores.SetSessionValue(newSessionID, "userid", user.UserID, conn)
-	if user.Auth == 1 {
+	stores.SetSessionValue(newSessionID, "userid", loginTryingUser.UserID, conn)
+	if loginTryingUser.Auth == 1 {
 		stores.SetSessionValue(newSessionID, "auth", "true", conn)
 	} else {
 		stores.SetSessionValue(newSessionID, "auth", "false", conn)
 	}
 
-	log.Println("login success: userid=", user.UserID)
+	log.Println("login success: userid=", loginTryingUser.UserID)
 
 	http.Redirect(w, req, "/", http.StatusSeeOther)
 }
@@ -139,6 +143,7 @@ func LogoutHandler(w http.ResponseWriter, req *http.Request) {
 // CheckIDHandler /checkidのPOSTハンドラ
 func CheckIDHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
+	formInputUserID := req.Form.Get("userid")
 
 	db, err := models.ConnectDB()
 	if err != nil {
@@ -148,7 +153,7 @@ func CheckIDHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	defer db.Close()
 
-	exist, err := models.CheckIDExist(db, req.Form.Get("userid"))
+	exist, err := models.CheckIDExist(db, formInputUserID)
 	if err != nil {
 		apperrors.ErrorHandler(err)
 		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)

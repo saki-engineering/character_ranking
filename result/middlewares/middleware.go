@@ -21,9 +21,9 @@ func Logging(next http.Handler) http.Handler {
 // CheckSessionID セッションIDがなければ付与する
 func CheckSessionID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		id, err := stores.GetSessionID(req)
+		sessionID, err := stores.GetSessionID(req)
 
-		if err != nil || id == "" {
+		if err != nil || sessionID == "" {
 			stores.SetSessionID(w)
 		}
 
@@ -43,14 +43,14 @@ func AuthAdmin(next http.Handler) http.Handler {
 		defer conn.Close()
 		sessionID, _ := stores.GetSessionID(req)
 
-		userid, err := stores.GetSessionValue(sessionID, "userid", conn)
+		nowLoginUserID, err := stores.GetSessionValue(sessionID, "userid", conn)
 		if err != nil {
 			apperrors.ErrorHandler(err)
 			http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 			return
 		}
 
-		if userid != "" {
+		if nowLoginUserID != "" {
 			next.ServeHTTP(w, req)
 		} else {
 			http.Error(w, "Forbidden", http.StatusForbidden)
@@ -70,14 +70,14 @@ func AuthSuperAdmin(next http.Handler) http.Handler {
 		defer conn.Close()
 		sessionID, _ := stores.GetSessionID(req)
 
-		auth, err := stores.GetSessionValue(sessionID, "auth", conn)
+		nowLoginUserAuth, err := stores.GetSessionValue(sessionID, "auth", conn)
 		if err != nil {
 			apperrors.ErrorHandler(err)
 			http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
 			return
 		}
 
-		if auth == "true" {
+		if nowLoginUserAuth == "true" {
 			next.ServeHTTP(w, req)
 		} else {
 			http.Error(w, "Forbidden", http.StatusForbidden)

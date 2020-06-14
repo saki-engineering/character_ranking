@@ -46,14 +46,15 @@ func SetSessionID(w http.ResponseWriter) (string, error) {
 		return "", err
 	}
 
+	newSessionID := uuid.String()
 	cookie := &http.Cookie{
 		Name:    SessionName,
-		Value:   uuid.String(),
+		Value:   newSessionID,
 		Expires: time.Now().AddDate(1, 0, 0),
 	}
 	http.SetCookie(w, cookie)
 
-	return uuid.String(), nil
+	return newSessionID, nil
 }
 
 // GetSessionValue セッションIDとfieldからvalueを取得
