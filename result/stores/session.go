@@ -2,6 +2,7 @@ package stores
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"app/apperrors"
@@ -17,7 +18,12 @@ var (
 
 // ConnectRedis redisと接続する
 func ConnectRedis() (redis.Conn, error) {
-	conn, err := redis.Dial("tcp", "redis:6379")
+	redisAddress := "redis:6379"
+	if redisURL := os.Getenv("REDIS_URL"); redisURL != "" {
+		redisAddress = redisURL + ":6379"
+	}
+
+	conn, err := redis.Dial("tcp", redisAddress)
 	if err != nil {
 		err = apperrors.SessionStrageConnectionFailed.Wrap(err, "cannot use session")
 		return conn, err
