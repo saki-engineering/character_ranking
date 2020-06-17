@@ -18,27 +18,23 @@ func main() {
 
 	db, err := models.ConnectDB()
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
+		log.Fatal(err.Code, err.Unwrap())
 	}
 
 	if err := models.CreateTable(db); err != nil {
-		apperrors.ErrorHandler(err)
-		log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
+		log.Fatal(err.Code, err.Unwrap())
 	} else {
 		log.Println("success to create adminuser table")
 	}
 
 	user, err := models.GetUserData(db, "admin")
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
+		log.Fatal(err.Code, err.Unwrap())
 	}
 	if user.UserID != "admin" {
 		err = models.UserCreate(db, "admin", "admin", 1)
 		if err != nil {
-			apperrors.ErrorHandler(err)
-			log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
+			log.Fatal(err.Code, err.Unwrap())
 		} else {
 			log.Println("success to create super admin user")
 		}
@@ -49,7 +45,6 @@ func main() {
 	err = http.ListenAndServe(":"+port, r)
 	if err != nil {
 		err = apperrors.HTTPServerPortListenFailed.Wrap(err, "server cannot listen port")
-		apperrors.ErrorHandler(err)
-		log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
+		log.Fatal(err.Code, err.Unwrap())
 	}
 }

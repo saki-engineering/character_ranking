@@ -1,40 +1,19 @@
 package apperrors
 
-import "log"
-
-// ErrorTypeを返すインターフェース
-type typeGetter interface {
-	Type() ErrorType
-}
-
-// GetType ErrorTypeを持つ場合はそれを返し、無ければUnknownを返す
-func GetType(err error) ErrorType {
-	for {
-		if e, ok := err.(typeGetter); ok {
-			return e.Type()
-		}
-		break
-	}
-	return Unknown
-}
-
-// AppError型のMessageを返すインターフェース
-type messageGetter interface {
-	Log() string
-}
-
-// GetMessage AppError型でエラーメッセージをもつ場合はそれを返し、なければ空文字列を返す
-func GetMessage(err error) string {
-	for {
-		if e, ok := err.(messageGetter); ok {
-			return e.Log()
-		}
-		break
-	}
-	return ""
-}
+import (
+	"errors"
+	"log"
+	"net/http"
+)
 
 // ErrorHandler エラーが発生したときのロギング・アプリの終了判定をここで一括で行う
-func ErrorHandler(err error) {
-	log.Println(GetType(err), "||", GetMessage(err), "||", err)
+func ErrorHandler(w http.ResponseWriter, req *http.Request, err error) {
+	var appErr *AppError
+	if errors.As(err, &appErr) {
+		log.Printf("[AppError] ErrorType %d: %s", appErr.Code, errors.Unwrap(appErr))
+	} else {
+		appErr = &AppError{Err: err, Code: Unknown, Message: "Unknown Error occured"}
+		log.Printf("[AppError] ErrorType %d: %s", appErr.Code, errors.Unwrap(appErr))
+	}
+	http.Error(w, appErr.Error(), http.StatusInternalServerError)
 }

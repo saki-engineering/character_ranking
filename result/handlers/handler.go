@@ -16,8 +16,7 @@ import (
 func RootHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("index")
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
@@ -28,8 +27,7 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 	page.Admin = false
 	conn, err := stores.ConnectRedis()
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer conn.Close()
@@ -46,8 +44,7 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 }
@@ -56,8 +53,7 @@ func RootHandler(w http.ResponseWriter, req *http.Request) {
 func LoginPageHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("login")
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
@@ -65,8 +61,7 @@ func LoginPageHandler(w http.ResponseWriter, req *http.Request) {
 	page.Title = "View Result!"
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 }
@@ -80,8 +75,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 
 	db, err := models.ConnectDB()
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer db.Close()
@@ -101,8 +95,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 
 	conn, err := stores.ConnectRedis()
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer conn.Close()
@@ -127,8 +120,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 func LogoutHandler(w http.ResponseWriter, req *http.Request) {
 	conn, err := stores.ConnectRedis()
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer conn.Close()
@@ -147,16 +139,14 @@ func CheckIDHandler(w http.ResponseWriter, req *http.Request) {
 
 	db, err := models.ConnectDB()
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer db.Close()
 
 	exist, err := models.CheckIDExist(db, formInputUserID)
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 

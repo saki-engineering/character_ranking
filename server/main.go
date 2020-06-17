@@ -18,7 +18,6 @@ func main() {
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
 		err = apperrors.HTTPServerPortListenFailed.Wrap(err, "server cannot listen port")
-		apperrors.ErrorHandler(err)
-		log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
+		log.Fatal(err.Code, err.Unwrap())
 	}
 }

@@ -16,13 +16,11 @@ func main() {
 
 	db, err := models.ConnectDB()
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
+		log.Fatal(err.Code, err.Unwrap())
 	}
 
 	if err := models.CreateTable(db); err != nil {
-		apperrors.ErrorHandler(err)
-		log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
+		log.Fatal(err.Code, err.Unwrap())
 	} else {
 		log.Println("success to create votes & users")
 	}
@@ -34,7 +32,6 @@ func main() {
 	err = http.ListenAndServe(":"+port, r)
 	if err != nil {
 		err = apperrors.HTTPServerPortListenFailed.Wrap(err, "server cannot listen port")
-		apperrors.ErrorHandler(err)
-		log.Fatal(apperrors.GetType(err), "||", apperrors.GetMessage(err), "||", err)
+		log.Fatal(err.Code, err.Unwrap())
 	}
 }

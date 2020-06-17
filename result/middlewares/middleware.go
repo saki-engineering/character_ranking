@@ -36,8 +36,7 @@ func AuthAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		conn, err := stores.ConnectRedis()
 		if err != nil {
-			apperrors.ErrorHandler(err)
-			http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+			apperrors.ErrorHandler(w, req, err)
 			return
 		}
 		defer conn.Close()
@@ -45,8 +44,7 @@ func AuthAdmin(next http.Handler) http.Handler {
 
 		nowLoginUserID, err := stores.GetSessionValue(sessionID, "userid", conn)
 		if err != nil {
-			apperrors.ErrorHandler(err)
-			http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+			apperrors.ErrorHandler(w, req, err)
 			return
 		}
 
@@ -63,8 +61,7 @@ func AuthSuperAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		conn, err := stores.ConnectRedis()
 		if err != nil {
-			apperrors.ErrorHandler(err)
-			http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+			apperrors.ErrorHandler(w, req, err)
 			return
 		}
 		defer conn.Close()
@@ -72,8 +69,7 @@ func AuthSuperAdmin(next http.Handler) http.Handler {
 
 		nowLoginUserAuth, err := stores.GetSessionValue(sessionID, "auth", conn)
 		if err != nil {
-			apperrors.ErrorHandler(err)
-			http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+			apperrors.ErrorHandler(w, req, err)
 			return
 		}
 

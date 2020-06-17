@@ -14,24 +14,21 @@ import (
 func VoteResultHandler(w http.ResponseWriter, req *http.Request) {
 	db, err := models.ConnectDB()
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer db.Close()
 
 	voteStructsData, err := models.GetAllVoteData(db)
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
 	jsonByteString, err := json.Marshal(voteStructsData)
 	if err != nil {
 		apperrors.JSONFormatFailed.Wrap(err, "fail to create json data")
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	w.Write([]byte(string(jsonByteString)))
@@ -44,16 +41,14 @@ func VoteCharaHandler(w http.ResponseWriter, req *http.Request) {
 
 	db, err := models.ConnectDB()
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer db.Close()
 
 	err = models.InsertVotes(db, req.Form.Get("character"), req.Form.Get("user"))
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	log.Println("vote insert success")
@@ -65,46 +60,45 @@ func CharaResultHandler(w http.ResponseWriter, req *http.Request) {
 
 	db, err := models.ConnectDB()
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer db.Close()
 
 	voteStructsData, err := models.GetCharaVoteData(db, vars["name"])
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
 	jsonByteString, err := json.Marshal(voteStructsData)
 	if err != nil {
 		apperrors.JSONFormatFailed.Wrap(err, "fail to create json data")
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
+		return
 	}
 	w.Write([]byte(string(jsonByteString)))
 }
 
 // VoteSammaryHandler /vote/summaryのGETハンドラ
 func VoteSammaryHandler(w http.ResponseWriter, req *http.Request) {
-	db, e := models.ConnectDB()
-	if e != nil {
-		log.Fatal("connect DB: ", e)
+	db, err := models.ConnectDB()
+	if err != nil {
+		apperrors.ErrorHandler(w, req, err)
+		return
 	}
 	defer db.Close()
 
 	resultStructsData, err := models.GetResultSummary(db)
 	if err != nil {
-		log.Println("fail GetResultSummary: ", err)
+		apperrors.ErrorHandler(w, req, err)
+		return
 	}
 
 	jsonByteString, err := json.Marshal(resultStructsData)
 	if err != nil {
 		apperrors.JSONFormatFailed.Wrap(err, "fail to create json data")
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	w.Write([]byte(string(jsonByteString)))

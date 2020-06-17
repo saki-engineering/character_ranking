@@ -14,8 +14,7 @@ import (
 func FormHandler(w http.ResponseWriter, req *http.Request) {
 	conn, err := stores.ConnectRedis()
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer conn.Close()
@@ -29,8 +28,7 @@ func FormHandler(w http.ResponseWriter, req *http.Request) {
 
 	tmpl, err := loadTemplate("form")
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
@@ -45,8 +43,7 @@ func FormHandler(w http.ResponseWriter, req *http.Request) {
 	page.Age = ageList
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 }
@@ -70,8 +67,7 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 	res, err := client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
 	if err != nil {
 		apperrors.VoteAPIRequestError.Wrap(err, "fail to vote")
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer res.Body.Close()
@@ -82,8 +78,7 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 	// ユーザー情報をsessionに付与
 	conn, err := stores.ConnectRedis()
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer conn.Close()
@@ -102,8 +97,7 @@ func FormVoteHandler(w http.ResponseWriter, req *http.Request) {
 	_, err = client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
 	if err != nil {
 		apperrors.VoteAPIRequestError.Wrap(err, "fail to vote")
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 

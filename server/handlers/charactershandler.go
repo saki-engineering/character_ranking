@@ -15,8 +15,7 @@ import (
 func CharacterHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("characters/index")
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
@@ -25,8 +24,7 @@ func CharacterHandler(w http.ResponseWriter, req *http.Request) {
 	page.Character = charas
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 }
@@ -35,8 +33,7 @@ func CharacterHandler(w http.ResponseWriter, req *http.Request) {
 func CharacterDetailHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("characters/detail")
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
@@ -46,8 +43,7 @@ func CharacterDetailHandler(w http.ResponseWriter, req *http.Request) {
 	page.Description = desp[vars["name"]]
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 }
@@ -58,8 +54,7 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 
 	conn, err := stores.ConnectRedis()
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer conn.Close()
@@ -84,8 +79,7 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 	_, err = client.Post(uStr, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
 	if err != nil {
 		apperrors.VoteAPIRequestError.Wrap(err, "fail to vote")
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
@@ -97,8 +91,7 @@ func CharacterVoteHandler(w http.ResponseWriter, req *http.Request) {
 func CharacterVotedHandler(w http.ResponseWriter, req *http.Request) {
 	tmpl, err := loadTemplate("characters/voted")
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
@@ -106,8 +99,7 @@ func CharacterVotedHandler(w http.ResponseWriter, req *http.Request) {
 	page.Title = "Completed!"
 	err = executeTemplate(w, tmpl, page)
 	if err != nil {
-		apperrors.ErrorHandler(err)
-		http.Error(w, apperrors.GetMessage(err), http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 }
