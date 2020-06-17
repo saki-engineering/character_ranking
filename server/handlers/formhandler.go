@@ -34,7 +34,7 @@ func FormHandler(w http.ResponseWriter, req *http.Request) {
 
 	ageList := make([]int, 99)
 	for i := 0; i < 99; i++ {
-		age[i] = i + 1
+		ageList[i] = i + 1
 	}
 
 	page := new(Page)
