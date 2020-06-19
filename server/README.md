@@ -66,6 +66,7 @@ voting(Today)Historyへの追加処理に使用
 サービス中で使用する環境変数一覧は以下の通り。
 
 - API_URL : vote_apiのURLを値として格納
+- REDIS_URL : redisのエンドポイント
 
 ### htmlテンプレートに渡す構造体
 `http/template`を利用して渡すGolang構造体を以下のように定義している。

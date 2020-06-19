@@ -37,6 +37,7 @@
 - DB_PASS : 本番環境でDBにアクセスするときのパスワード
 - DB_ADDRESS : 本番環境で使用するDBのエンドポイント
 - API_URL : vote_apiのURLを値として格納
+- REDIS_URL : redisのエンドポイント
 
 ### htmlテンプレートに渡す構造体
 `http/template`を利用して渡すGolang構造体を以下のように定義している。
