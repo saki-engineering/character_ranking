@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: character-ranking-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: character-ranking
+  template:
+    metadata:
+      labels:
+        app: character-ranking
+        tier: development-redis
+    spec:
+      containers:
+      - name: k8s-redis
+        image: redis:latest
+        #imagePullPolicy: Never
+        ports:
+        - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    app: character-ranking
+spec:
+  type:
+    NodePort
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+  selector:
+    # 以下のlabelがついているpodを対象にする
+    app: character-ranking
+    tier: development-redis

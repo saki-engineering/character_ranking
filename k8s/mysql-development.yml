@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: character-ranking-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: character-ranking
+  template:
+    metadata:
+      labels:
+        app: character-ranking
+        tier: development-mysql
+    spec:
+      volumes:
+      - name: k8s-mysql-storage
+        hostPath:
+          path: $HOME/Desktop/k8s
+          #path: /k8s/mysql
+      containers:
+      - name: k8s-mysql
+        image: mysql:5.7
+        #imagePullPolicy: Never
+        volumeMounts:
+        - name: k8s-mysql-storage
+          mountPath: /var/lib/mysql
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_USER
+          value: root
+        - name: MYSQL_ROOT_PASSWORD
+          value: pass
+        - name: MYSQL_DATABASE
+          value: sampledb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: character-ranking
+spec:
+  # 全てのノードのループバック:3306でここにアクセスされるようになる
+  type:
+    NodePort
+  ports:
+      # サービスがlistenするポート
+    - port: 3306
+      # サービスが転送するpodのlistenポート
+      targetPort: 3306
+      protocol: TCP
+  selector:
+    # 以下のlabelがついているpodを対象にする
+    app: character-ranking
+    tier: development-mysql
