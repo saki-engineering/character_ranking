@@ -35,7 +35,7 @@ func executeTemplate(w http.ResponseWriter, tmpl *template.Template, page *Page)
 func apiURLString(path string) string {
 	url := &url.URL{}
 	url.Scheme = "http"
-	url.Host = "vote_api:9090"
+	url.Host = "vote-api:9090"
 	if apiURL := os.Getenv("API_URL"); apiURL != "" {
 		url.Host = apiURL + ":9090"
 	}
