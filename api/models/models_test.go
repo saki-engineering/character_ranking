@@ -32,10 +32,11 @@ func TestCountCharasTableRow(t *testing.T) {
 }
 
 func TestInsertVotes(t *testing.T) {
-	db, mock, err := sqlmock.New()
+	sqldb, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+	db := RealDB{sqldb}
 	defer db.Close()
 
 	mock.ExpectBegin()
@@ -45,7 +46,7 @@ func TestInsertVotes(t *testing.T) {
 
 	db.Begin()
 
-	if err := InsertVotes(db, "cinnamon", "1"); err != nil {
+	if err := db.InsertVotes("cinnamon", "1"); err != nil {
 		t.Error(errors.Unwrap(err))
 	}
 	if err := mock.ExpectationsWereMet(); err != nil {
@@ -54,10 +55,11 @@ func TestInsertVotes(t *testing.T) {
 }
 
 func TestGetAllVoteData(t *testing.T) {
-	db, mock, err := sqlmock.New()
+	sqldb, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+	db := RealDB{sqldb}
 	defer db.Close()
 
 	dataLen := 3
@@ -74,7 +76,7 @@ func TestGetAllVoteData(t *testing.T) {
 	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM votes")).WillReturnRows(rows)
 
 	db.Begin()
-	vote, err := GetAllVoteData(db)
+	vote, err := db.GetAllVoteData()
 	if err != nil {
 		t.Error(err)
 		return
@@ -99,10 +101,11 @@ func TestGetAllVoteData(t *testing.T) {
 }
 
 func TestGetCharaVoteData(t *testing.T) {
-	db, mock, err := sqlmock.New()
+	sqldb, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+	db := RealDB{sqldb}
 	defer db.Close()
 
 	dataLen := 4
@@ -122,7 +125,7 @@ func TestGetCharaVoteData(t *testing.T) {
 		WHERE votes.chara = ?`)).WithArgs("cinnamon").WillReturnRows(rows)
 
 	db.Begin()
-	vote, err := GetCharaVoteData(db, "cinnamon")
+	vote, err := db.GetCharaVoteData("cinnamon")
 	if err != nil {
 		t.Error(err)
 		return
@@ -147,10 +150,11 @@ func TestGetCharaVoteData(t *testing.T) {
 }
 
 func TestGetResultSummary(t *testing.T) {
-	db, mock, err := sqlmock.New()
+	sqldb, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+	db := RealDB{sqldb}
 	defer db.Close()
 
 	dataLen := 5
@@ -166,7 +170,7 @@ func TestGetResultSummary(t *testing.T) {
 	right join votes on charas.chara = votes.chara group by charas.id`)).WillReturnRows(rows)
 
 	db.Begin()
-	result, err := GetResultSummary(db)
+	result, err := db.GetResultSummary()
 	if err != nil {
 		t.Error(err)
 		return
@@ -191,10 +195,11 @@ func TestGetResultSummary(t *testing.T) {
 }
 
 func TestGetUserSummary(t *testing.T) {
-	db, mock, err := sqlmock.New()
+	sqldb, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+	db := RealDB{sqldb}
 	defer db.Close()
 
 	dataLen := 4
@@ -218,7 +223,7 @@ func TestGetUserSummary(t *testing.T) {
 		WithArgs(gender, age, age+9).WillReturnRows(rows)
 
 	db.Begin()
-	vote, err := GetUserSummary(db, gender, age)
+	vote, err := db.GetUserSummary(gender, age)
 	if err != nil {
 		t.Error(err)
 		return
@@ -243,10 +248,11 @@ func TestGetUserSummary(t *testing.T) {
 }
 
 func TestGetUserData(t *testing.T) {
-	db, mock, err := sqlmock.New()
+	sqldb, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+	db := RealDB{sqldb}
 	defer db.Close()
 
 	dataLen := 5
@@ -273,7 +279,7 @@ func TestGetUserData(t *testing.T) {
 			FROM users GROUP BY agelayer, gender`)).WillReturnRows(rows)
 
 	db.Begin()
-	user, err := GetUserData(db)
+	user, err := db.GetUserData()
 	if err != nil {
 		t.Error(err)
 		return
@@ -298,10 +304,11 @@ func TestGetUserData(t *testing.T) {
 }
 
 func TestInsertUsers(t *testing.T) {
-	db, mock, err := sqlmock.New()
+	sqldb, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+	db := RealDB{sqldb}
 	defer db.Close()
 
 	age, gender, address := "22", "1", "13"
@@ -313,7 +320,7 @@ func TestInsertUsers(t *testing.T) {
 
 	db.Begin()
 
-	userID, err := InsertUsers(db, age, gender, address)
+	userID, err := db.InsertUsers(age, gender, address)
 	if userID != 1 {
 		t.Errorf("returnValue is not 1: userID = %d", userID)
 	}

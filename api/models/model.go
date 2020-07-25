@@ -39,8 +39,20 @@ type chara struct {
 	Name string // キャラ名
 }
 
+type RealDB struct {
+	DB *sql.DB
+}
+
+func (db RealDB) Begin() {
+	db.DB.Begin()
+}
+
+func (db RealDB) Close() error {
+	return db.DB.Close()
+}
+
 // ConnectDB DBと接続してポインタを返す
-func ConnectDB() (*sql.DB, error) {
+func ConnectDB() (RealDB, error) {
 	dbDriver := "mysql"
 	dbUser := "root"
 	dbPass := "pass"
@@ -57,9 +69,9 @@ func ConnectDB() (*sql.DB, error) {
 	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp("+dbAddress+":3306)/"+dbName)
 	if err != nil {
 		apperrors.DBConnectionFailed.Wrap(err, "cannot connect to DB")
-		return nil, err
+		return RealDB{nil}, err
 	}
-	return db, nil
+	return RealDB{db}, nil
 }
 
 func countCharasTableRow(db *sql.DB) (int64, error) {
@@ -142,7 +154,8 @@ func CreateTable(db *sql.DB) error {
 }
 
 // InsertVotes 指定キャラの投票データをDBに追加
-func InsertVotes(db *sql.DB, chara, user string) error {
+func (sqldb RealDB) InsertVotes(chara, user string) error {
+	db := sqldb.DB
 	const sqlStr = `INSERT INTO votes(chara, user, created_at) VALUES (?, ?, cast(now() as datetime));`
 
 	_, err := db.Exec(sqlStr, chara, user)
@@ -154,7 +167,8 @@ func InsertVotes(db *sql.DB, chara, user string) error {
 }
 
 // GetAllVoteData votesテーブルの全てのデータを取得
-func GetAllVoteData(db *sql.DB) ([]Vote, error) {
+func (sqldb RealDB) GetAllVoteData() ([]Vote, error) {
+	db := sqldb.DB
 	const sqlStr = `SELECT * FROM votes;`
 
 	rows, err := db.Query(sqlStr)
@@ -178,7 +192,8 @@ func GetAllVoteData(db *sql.DB) ([]Vote, error) {
 }
 
 // GetCharaVoteData 指定キャラクターの投票データを取得
-func GetCharaVoteData(db *sql.DB, chara string) ([]Vote, error) {
+func (sqldb RealDB) GetCharaVoteData(chara string) ([]Vote, error) {
+	db := sqldb.DB
 	const sqlStr = `SELECT users.id, users.age, users.gender, users.address, votes.created_at, votes.ip
 					FROM votes LEFT JOIN users ON users.id = votes.user
 					WHERE votes.chara = ?;`
@@ -204,7 +219,8 @@ func GetCharaVoteData(db *sql.DB, chara string) ([]Vote, error) {
 }
 
 // GetResultSummary 各キャラとその得票数のデータを取得
-func GetResultSummary(db *sql.DB) ([]Result, error) {
+func (sqldb RealDB) GetResultSummary() ([]Result, error) {
+	db := sqldb.DB
 	const sqlStr = `SELECT charas.id, count(*)
 					FROM charas
 					right join votes on charas.chara = votes.chara
@@ -231,7 +247,8 @@ func GetResultSummary(db *sql.DB) ([]Result, error) {
 }
 
 // GetUserSummary 性別:gender・年齢:agemin~agemin+9の人たちの投票をみる
-func GetUserSummary(db *sql.DB, gender, agemin int) ([]Vote, error) {
+func (sqldb RealDB) GetUserSummary(gender, agemin int) ([]Vote, error) {
+	db := sqldb.DB
 	const sqlStr = `SELECT users.id, users.address, votes.chara, votes.created_at, votes.ip
 					FROM votes LEFT JOIN users ON users.id = votes.user
 					WHERE users.gender = ? AND users.age BETWEEN ? AND ?;`
@@ -257,7 +274,8 @@ func GetUserSummary(db *sql.DB, gender, agemin int) ([]Vote, error) {
 }
 
 // GetUserData 投票に参加した人の一覧データを取得
-func GetUserData(db *sql.DB) ([]User, error) {
+func (sqldb RealDB) GetUserData() ([]User, error) {
+	db := sqldb.DB
 	const sqlStr = `SELECT count(*), (case when (age between 0 and 9) then 0
 										   when (age between 10 and 19) then 1
 										   when (age between 20 and 29) then 2
@@ -291,7 +309,8 @@ func GetUserData(db *sql.DB) ([]User, error) {
 }
 
 // InsertUsers 投票に参加したユーザーのデータをDBに追加
-func InsertUsers(db *sql.DB, age, gender, address string) (int64, error) {
+func (sqldb RealDB) InsertUsers(age, gender, address string) (int64, error) {
+	db := sqldb.DB
 	const sqlStr = `INSERT INTO users(age, gender, address) VALUES (?, ?, ?);`
 
 	result, err := db.Exec(sqlStr, age, gender, address)

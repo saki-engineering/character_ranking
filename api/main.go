@@ -14,10 +14,12 @@ func main() {
 	port := "9090"
 	fmt.Printf("API Server Listening on port %s\n", port)
 
-	db, err := models.ConnectDB()
+	// sqldbはRealDB型
+	sqldb, err := models.ConnectDB()
 	if err != nil {
 		log.Fatal("fatal err: ", err)
 	}
+	db := sqldb.DB
 
 	if err := models.CreateTable(db); err != nil {
 		log.Fatal("fatal err: ", err)

@@ -2,19 +2,18 @@ package handlers
 
 import (
 	"app/models"
-	"database/sql"
 )
 
 type DB interface {
+	Begin()
 	Close() error
-}
-
-type RealDB struct {
-	DB *sql.DB
-}
-
-func (db RealDB) Close() error {
-	return db.DB.Close()
+	InsertVotes(string, string) error
+	GetAllVoteData() ([]models.Vote, error)
+	GetCharaVoteData(string) ([]models.Vote, error)
+	GetResultSummary() ([]models.Result, error)
+	GetUserSummary(int, int) ([]models.Vote, error)
+	GetUserData() ([]models.User, error)
+	InsertUsers(string, string, string) (int64, error)
 }
 
 type mockDB struct{}

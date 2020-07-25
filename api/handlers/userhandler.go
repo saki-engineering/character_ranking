@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"app/apperrors"
-	"app/models"
 	"encoding/json"
 
 	"fmt"
@@ -14,14 +13,14 @@ import (
 
 // UserSummaryHandler /user/のGETハンドラ
 func UserSummaryHandler(w http.ResponseWriter, req *http.Request) {
-	db, err := models.ConnectDB()
+	db, err := connectDB()
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer db.Close()
 
-	userStructsData, err := models.GetUserData(db)
+	userStructsData, err := db.GetUserData()
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return
@@ -41,14 +40,14 @@ func UserSummaryHandler(w http.ResponseWriter, req *http.Request) {
 func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
-	db, err := models.ConnectDB()
+	db, err := connectDB()
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer db.Close()
 
-	insertedUserID, err := models.InsertUsers(db, req.Form.Get("age"), req.Form.Get("gender"), req.Form.Get("address"))
+	insertedUserID, err := db.InsertUsers(req.Form.Get("age"), req.Form.Get("gender"), req.Form.Get("address"))
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return
@@ -62,7 +61,7 @@ func CreateUserHandler(w http.ResponseWriter, req *http.Request) {
 func UserResultHandler(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 
-	db, err := models.ConnectDB()
+	db, err := connectDB()
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return
@@ -72,7 +71,7 @@ func UserResultHandler(w http.ResponseWriter, req *http.Request) {
 	gender, _ := strconv.Atoi(vars["gender"])
 	agemin, _ := strconv.Atoi(vars["agemin"])
 
-	voteStructData, err := models.GetUserSummary(db, gender, agemin)
+	voteStructData, err := db.GetUserSummary(gender, agemin)
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"app/apperrors"
-	"app/models"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -12,14 +11,14 @@ import (
 
 // VoteResultHandler /vote/のGETハンドラ
 func VoteResultHandler(w http.ResponseWriter, req *http.Request) {
-	db, err := models.ConnectDB()
+	db, err := connectDB()
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer db.Close()
 
-	voteStructsData, err := models.GetAllVoteData(db)
+	voteStructsData, err := db.GetAllVoteData()
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return
@@ -39,14 +38,14 @@ func VoteResultHandler(w http.ResponseWriter, req *http.Request) {
 func VoteCharaHandler(w http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
-	db, err := models.ConnectDB()
+	db, err := connectDB()
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer db.Close()
 
-	err = models.InsertVotes(db, req.Form.Get("character"), req.Form.Get("user"))
+	err = db.InsertVotes(req.Form.Get("character"), req.Form.Get("user"))
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return
@@ -58,14 +57,14 @@ func VoteCharaHandler(w http.ResponseWriter, req *http.Request) {
 func CharaResultHandler(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 
-	db, err := models.ConnectDB()
+	db, err := connectDB()
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer db.Close()
 
-	voteStructsData, err := models.GetCharaVoteData(db, vars["name"])
+	voteStructsData, err := db.GetCharaVoteData(vars["name"])
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return
@@ -82,14 +81,14 @@ func CharaResultHandler(w http.ResponseWriter, req *http.Request) {
 
 // VoteSammaryHandler /vote/summaryのGETハンドラ
 func VoteSammaryHandler(w http.ResponseWriter, req *http.Request) {
-	db, err := models.ConnectDB()
+	db, err := connectDB()
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	defer db.Close()
 
-	resultStructsData, err := models.GetResultSummary(db)
+	resultStructsData, err := db.GetResultSummary()
 	if err != nil {
 		apperrors.ErrorHandler(w, req, err)
 		return
