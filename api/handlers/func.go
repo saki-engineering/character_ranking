@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"app/models"
+	"os"
 )
 
 type DB interface {
@@ -16,17 +17,10 @@ type DB interface {
 	InsertUsers(string, string, string) (int64, error)
 }
 
-type mockDB struct{}
-
-func (db mockDB) Close() error {
-	return nil
-}
-
 func connectDB() (DB, error) {
-	// ReadDBの方
+	if os.Getenv("DB_ENV") == "test" {
+		db := mockDB{}
+		return db, nil
+	}
 	return models.ConnectDB()
-
-	// mockDBの方
-	//db := mockDB{}
-	//return db, nil
 }
